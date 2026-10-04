@@ -6,7 +6,8 @@ import {
   Activity,
   Bug,
   Cpu,
-  ChevronLeft,
+  PanelLeftClose,
+  PanelLeftOpen,
   type LucideIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -43,18 +44,27 @@ export function Sidebar() {
         collapsed ? 'w-[56px]' : 'w-[220px]'
       )}
     >
-      <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
+      <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-2">
         <div className="flex size-7 shrink-0 items-center justify-center bg-foreground font-mono text-sm font-bold text-background">
           K
         </div>
         {!collapsed && (
-          <div className="flex flex-col leading-none">
+          <div className="flex flex-1 flex-col leading-none">
             <span className="text-sm font-semibold tracking-tight">KivX</span>
             <span className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
               Dashboard
             </span>
           </div>
         )}
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          className="flex size-7 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
+        >
+          {collapsed ? <PanelLeftOpen className="size-3.5" /> : <PanelLeftClose className="size-3.5" />}
+        </button>
       </div>
 
       <nav className="flex-1 overflow-y-auto px-2 py-3">
@@ -98,20 +108,6 @@ export function Sidebar() {
 
       <div className="mt-auto">
         <ProfileMenu />
-
-        <div className="border-t border-sidebar-border p-2">
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="flex h-7 w-full items-center gap-2 px-2 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-          >
-            <ChevronLeft
-              className={cn('size-3.5 shrink-0 transition-transform', collapsed && 'rotate-180')}
-            />
-            {!collapsed && <span>Collapse</span>}
-          </button>
-        </div>
       </div>
     </aside>
   );
