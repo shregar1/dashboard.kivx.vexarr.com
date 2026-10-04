@@ -13,7 +13,6 @@ import { Route as SettingsSttRoute } from '@/routes/settings/stt';
 import { Route as SettingsHotkeysRoute } from '@/routes/settings/hotkeys';
 import { Route as SettingsDataRoute } from '@/routes/settings/data';
 // import { Route as SettingsCameraRoute } from '@/routes/settings/camera';
-import { Route as SettingsTelemetryRoute } from '@/routes/settings/telemetry';
 // Virtual camera is disabled for now — the route file still exists
 // but isn't wired into the router. Uncomment to bring it back.
 import { Route as SessionsRoute } from '@/routes/sessions/route';
@@ -37,8 +36,7 @@ const routeTree = RootRoute.addChildren([
       SettingsAudioRoute,
       SettingsSttRoute,
       SettingsHotkeysRoute,
-      SettingsDataRoute,
-      SettingsTelemetryRoute
+      SettingsDataRoute
     ]),
     SessionsRoute.addChildren([SessionsIndexRoute, SessionDetailRoute]),
     PersonalityRoute.addChildren([

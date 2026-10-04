@@ -25,8 +25,7 @@ const SETTINGS_NAV: NavItem[] = [
   { to: '/settings/audio', label: 'Audio', icon: Volume2 },
   { to: '/settings/stt', label: 'Speech-to-text', icon: Mic },
   { to: '/settings/hotkeys', label: 'Hotkeys', icon: Keyboard },
-  { to: '/settings/data', label: 'Data', icon: Database },
-  { to: '/settings/telemetry', label: 'Telemetry', icon: Activity }
+  { to: '/settings/data', label: 'Data', icon: Database }
 ];
 
 const SESSIONS_NAV: NavItem[] = [
