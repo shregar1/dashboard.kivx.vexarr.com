@@ -304,7 +304,7 @@ export function DiagnosticsPanel() {
         </CardHeader>
         <CardContent>
           <Link
-            to="/diagnostics/bug-report"
+            to="/report/bug"
             className="inline-flex h-8 items-center gap-2 border border-border bg-background px-3 text-sm font-medium transition-colors hover:bg-secondary"
           >
             <Bug className="size-3.5" />

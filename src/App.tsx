@@ -24,7 +24,7 @@ import { Route as PersonalityOverviewRoute } from '@/routes/personality/overview
 import { Route as PersonalityDimensionsRoute } from '@/routes/personality/dimensions';
 import { Route as PersonalityRulesRoute } from '@/routes/personality/do-dont';
 import { Route as DiagnosticsRoute } from '@/routes/diagnostics/index';
-import { Route as BugReportRoute } from '@/routes/diagnostics/bug-report';
+import { Route as BugReportRoute } from '@/routes/report/bug';
 
 const routeTree = RootRoute.addChildren([
   SigninRoute,
@@ -45,7 +45,8 @@ const routeTree = RootRoute.addChildren([
       PersonalityDimensionsRoute,
       PersonalityRulesRoute
     ]),
-    DiagnosticsRoute.addChildren([BugReportRoute])
+    DiagnosticsRoute.addChildren([]),
+    BugReportRoute
   ])
 ]);
 
