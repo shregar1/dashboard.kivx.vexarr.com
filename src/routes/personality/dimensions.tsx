@@ -1,6 +1,6 @@
 import { createRoute } from '@tanstack/react-router';
 
-import { Route as PersonalityRoute } from '@/routes/personality';
+import { Route as PersonalityRoute } from '@/routes/personality/route';
 import { PageHeader } from '@/components/layout/page';
 import { PersonalityDimensions } from '@/features/personality-viewer/PersonalityDimensions';
 

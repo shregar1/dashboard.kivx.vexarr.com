@@ -76,12 +76,14 @@ export const Route = createRoute({
 function AuthedLayout() {
   const hydrated = useProfile((s) => s.hydrated);
   const isAuthed = useProfile((s) => s.isAuthenticated);
+  // Subscribe to the raw pathname — useRouter's state is stable and
+  // the router re-renders this component when the route changes, so
+  // a plain string read is enough. (Wrapping it in `useLocation({ select })`
+  // with a fresh object literal causes the select function to return a
+  // new reference every render, which the router treats as a change
+  // and re-fires → infinite redirect loop.)
   const router = useRouter();
-  // useLocation is the proper TanStack Router hook for the current
-  // pathname — it subscribes to updates so the per-page sidebar
-  // re-renders when the route changes. (router.state.location only
-  // captures the state at mount time inside a parent layout.)
-  const { pathname } = useLocation({ select: (l) => ({ pathname: l.pathname }) });
+  const pathname = router.state.location.pathname;
   const nav = useNavForCurrentPath(pathname);
 
   if (!hydrated) {
