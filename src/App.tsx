@@ -9,9 +9,7 @@ import { Route as SettingsRoute } from '@/routes/settings/route';
 import { Route as SettingsLlmRoute } from '@/routes/settings/llm';
 import { Route as SettingsAudioRoute } from '@/routes/settings/audio';
 import { Route as SettingsSttRoute } from '@/routes/settings/stt';
-import { Route as SettingsTtsRoute } from '@/routes/settings/tts';
 import { Route as SettingsHotkeysRoute } from '@/routes/settings/hotkeys';
-import { Route as SettingsPromptsRoute } from '@/routes/settings/prompts';
 import { Route as SettingsDataRoute } from '@/routes/settings/data';
 import { Route as SettingsCameraRoute } from '@/routes/settings/camera';
 import { Route as SettingsTelemetryRoute } from '@/routes/settings/telemetry';
@@ -31,9 +29,7 @@ const routeTree = RootRoute.addChildren([
       SettingsLlmRoute,
       SettingsAudioRoute,
       SettingsSttRoute,
-      SettingsTtsRoute,
       SettingsHotkeysRoute,
-      SettingsPromptsRoute,
       SettingsDataRoute,
       SettingsCameraRoute,
       SettingsTelemetryRoute

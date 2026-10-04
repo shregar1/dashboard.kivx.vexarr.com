@@ -38,12 +38,7 @@ const BUILTIN_PROVIDERS: Array<{ id: string; label: string; baseURL?: string; bu
   { id: 'openai', label: 'OpenAI', baseURL: 'https://api.openai.com/v1', builtin: true },
   { id: 'gemini', label: 'Google Gemini', builtin: true },
   { id: 'deepseek', label: 'DeepSeek', baseURL: 'https://api.deepseek.com/v1', builtin: true },
-  { id: 'openrouter', label: 'OpenRouter', baseURL: 'https://openrouter.ai/api/v1', builtin: true },
-  { id: 'groq', label: 'Groq', baseURL: 'https://api.groq.com/openai/v1', builtin: true },
-  { id: 'mistral', label: 'Mistral', baseURL: 'https://api.mistral.ai/v1', builtin: true },
-  { id: 'kiv', label: 'KivX (hosted)', builtin: true },
-  { id: 'local-ollama', label: 'Local (Ollama)', baseURL: 'http://127.0.0.1:11434/v1', builtin: true },
-  { id: 'custom', label: 'Custom OpenAI-compatible' }
+  { id: 'openrouter', label: 'OpenRouter', baseURL: 'https://openrouter.ai/api/v1', builtin: true }
 ];
 
 export function LlmProvidersPanel() {
