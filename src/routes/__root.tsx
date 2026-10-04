@@ -1,9 +1,9 @@
-import { createRootRoute } from '@tanstack/react-router';
+import { createRootRoute, Outlet } from '@tanstack/react-router';
 
-import { Shell } from '@/components/layout/shell';
-
-// `Shell` already renders the matching child route via its own
-// `<Outlet />`, so the root component is a 1:1 pass-through.
+// The root route is a thin pass-through. Authenticated routes live
+// under `routes/_authed.tsx` (which adds the shell), the sign-in
+// page is a sibling that renders without it. The router picks the
+// right one based on the URL.
 export const Route = createRootRoute({
-  component: Shell
+  component: () => <Outlet />
 });
