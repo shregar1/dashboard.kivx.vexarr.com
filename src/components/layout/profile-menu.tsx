@@ -3,7 +3,6 @@ import { useNavigate } from '@tanstack/react-router';
 import {
   KeyRound,
   Settings,
-  HelpCircle,
   LogOut,
   ChevronUp
 } from 'lucide-react';
@@ -96,20 +95,6 @@ export function ProfileMenu() {
       >
         <Settings className="size-3.5" />
         Settings
-      </MenuItem>
-
-      <MenuSeparator />
-
-      {/* Help */}
-      <MenuLabel>Help</MenuLabel>
-      <MenuItem
-        onClick={() => {
-          setOpen(false);
-          void ipc.openExternal('https://kivx.ai/docs');
-        }}
-      >
-        <HelpCircle className="size-3.5" />
-        Documentation
       </MenuItem>
 
       <MenuSeparator />
