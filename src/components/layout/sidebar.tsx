@@ -65,16 +65,7 @@ export function Sidebar() {
               </div>
             )}
             <NavList items={groups.main} />
-            {groups.debug.length > 0 && (
-              <>
-                {!collapsed && (
-                  <div className="mt-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Debug
-                  </div>
-                )}
-                <NavList items={groups.debug} />
-              </>
-            )}
+            {groups.debug.length > 0 && <NavList items={groups.debug} />}
           </div>
         ) : (
           !collapsed && (
