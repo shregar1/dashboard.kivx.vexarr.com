@@ -1,4 +1,4 @@
-import { createRoute, Outlet, Link } from '@tanstack/react-router';
+import { createRoute, Outlet } from '@tanstack/react-router';
 
 import { Route as RootRoute } from '@/routes/__root';
 
@@ -12,7 +12,6 @@ function SessionsLayout() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6">
       <Outlet />
-      <Link to="/sessions" />
     </div>
   );
 }
