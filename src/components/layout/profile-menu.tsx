@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import {
-  KeyRound,
+  Bug,
   Settings,
   LogOut,
   ChevronUp
@@ -95,6 +95,15 @@ export function ProfileMenu() {
       >
         <Settings className="size-3.5" />
         Settings
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
+          setOpen(false);
+          void navigate({ to: '/report/bug' });
+        }}
+      >
+        <Bug className="size-3.5" />
+        Report a bug
       </MenuItem>
 
       <MenuSeparator />
