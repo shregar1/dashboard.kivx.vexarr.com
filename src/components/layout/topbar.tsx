@@ -1,11 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { Moon, Sun, MonitorSmartphone, RefreshCw, ExternalLink } from 'lucide-react';
+import { Moon, Sun, MonitorSmartphone, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useUi, type Theme } from '@/stores/ui-store';
 import { ipc } from '@/lib/ipc';
 import { cn } from '@/lib/utils';
+
+const THEME_CYCLE: Array<{ value: Theme; icon: typeof Sun; label: string }> = [
+  { value: 'light', icon: Sun, label: 'Light' },
+  { value: 'dark', icon: Moon, label: 'Dark' },
+  { value: 'system', icon: MonitorSmartphone, label: 'System' }
+];
 
 export function Topbar() {
   const theme = useUi((s) => s.theme);
@@ -35,9 +40,6 @@ export function Topbar() {
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-5">
       <div className="flex items-center gap-3">
         <ConnectionPill connected={connected} />
-        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          v0.1.0
-        </span>
       </div>
 
       <div className="flex items-center gap-1.5">
@@ -73,36 +75,29 @@ function ConnectionPill({ connected }: { connected: boolean | null }) {
         )}
       />
       <span className="font-medium">{label}</span>
-      <span className="text-muted-foreground">to KivX host</span>
     </div>
   );
 }
 
+/**
+ * Single-button theme cycle. Click → light → dark → system → light …
+ * The icon shows the *current* mode; aria-label reflects the *next*
+ * mode the click will select, which doubles as the tooltip.
+ */
 function ThemeToggle({ theme, onTheme }: { theme: Theme; onTheme: (t: Theme) => void }) {
+  const currentIdx = THEME_CYCLE.findIndex((t) => t.value === theme);
+  const current = THEME_CYCLE[currentIdx] ?? THEME_CYCLE[0];
+  const next = THEME_CYCLE[(currentIdx + 1) % THEME_CYCLE.length];
+  const Icon = current.icon;
   return (
-    <div className="inline-flex h-8 items-center border border-border">
-      {(['dark', 'light', 'system'] as const).map((t, i) => {
-        const Icon = t === 'dark' ? Moon : t === 'light' ? Sun : MonitorSmartphone;
-        const active = theme === t;
-        return (
-          <button
-            key={t}
-            type="button"
-            aria-label={`Theme: ${t}`}
-            onClick={() => onTheme(t)}
-            className={cn(
-              'inline-flex h-full w-7 items-center justify-center transition-colors',
-              i > 0 && 'border-l border-border',
-              active ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'
-            )}
-          >
-            <Icon className="size-3.5" />
-          </button>
-        );
-      })}
-    </div>
+    <button
+      type="button"
+      aria-label={`Theme: ${current.label} (click for ${next.label})`}
+      title={`Theme: ${current.label}`}
+      onClick={() => onTheme(next.value)}
+      className="inline-flex h-8 w-8 items-center justify-center border border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    >
+      <Icon className="size-4" />
+    </button>
   );
 }
-
-// keep references
-void Badge;
