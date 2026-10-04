@@ -10,13 +10,19 @@ import {
   RefreshCw,
   Bot,
   Pencil,
-  ChevronDown,
-  ChevronUp
+  Sparkles,
+  ChevronUp,
+  Activity,
+  Zap,
+  Settings2,
+  Gauge,
+  KeyRound,
+  CirclePlus,
+  CircleCheck
 } from 'lucide-react';
 
-import { Section, SectionRow, EmptyState } from '@/components/shared/section';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
@@ -45,142 +51,261 @@ export function LlmProvidersPanel() {
   const providers = (config.data?.providers ?? {}) as ProvidersMap;
   const activeProvider = config.data?.activeProvider;
   const responseMode = config.data?.responseMode ?? 'auto';
+  const maxTokens = config.data?.llm?.maxTokens ?? 2048;
 
   const customIds = Object.keys(providers).filter(
     (id) => !BUILTIN_PROVIDERS.some((b) => b.id === id)
   );
 
-  const allProviders = [
+  const allProviders: Array<{ id: string; label: string; baseURL?: string; builtin?: boolean; configured: boolean }> = [
     ...BUILTIN_PROVIDERS.map((p) => ({ ...p, configured: Boolean(providers[p.id]?.apiKey) })),
     ...customIds.map((id) => {
       const e = providers[id];
-      return { id, label: e.label ?? id, baseURL: e.baseURL, builtin: e.builtin };
+      return { id, label: e.label ?? id, baseURL: e.baseURL, builtin: e.builtin, configured: true };
     })
   ];
 
+  const active = allProviders.find((p) => p.id === activeProvider);
+  const configuredCount = allProviders.filter((p) => p.configured || providers[p.id]?.apiKey).length;
+
   return (
-    <div className="flex flex-col gap-6">
-      <Section
-        title="Active provider"
-        description="The model that answers questions during a session."
-      >
-        <SectionRow label="Provider" description="Used by default for new sessions.">
-          <ActiveProviderSelect value={activeProvider} providers={allProviders} />
-        </SectionRow>
+    <div className="flex flex-col gap-4">
+      {/* ── Top stats strip ───────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <KpiCard
+          icon={<Sparkles className="size-3.5" />}
+          label="Active"
+          value={active?.label ?? 'None'}
+          hint={activeProvider ?? 'no provider'}
+        />
+        <KpiCard
+          icon={<Bot className="size-3.5" />}
+          label="Configured"
+          value={`${configuredCount}`}
+          hint={`of ${allProviders.length} available`}
+        />
+        <KpiCard
+          icon={<Activity className="size-3.5" />}
+          label="Mode"
+          value={responseMode}
+          hint="response verbosity"
+        />
+        <KpiCard
+          icon={<Gauge className="size-3.5" />}
+          label="Max tokens"
+          value={maxTokens.toLocaleString()}
+          hint="per turn"
+        />
+      </div>
 
-        <SectionRow label="Response mode" description="How verbose KivX's answers should be.">
-          <ResponseModeSelect value={responseMode} />
-        </SectionRow>
+      {/* ── Two primary config cards ──────────────────────────────────── */}
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <ActiveProviderCard
+          value={activeProvider}
+          providers={allProviders}
+        />
+        <ResponseBehaviorCard
+          responseMode={responseMode}
+          maxTokens={maxTokens}
+        />
+      </div>
 
-        <SectionRow label="Max tokens" description="Cap on the answer length per turn.">
-          <MaxTokensField />
-        </SectionRow>
-      </Section>
-
-      <Section
-        title="Configured providers"
-        description="Each card stores its own API key, base URL, and model. The active provider is highlighted."
-      >
-        {allProviders.length === 0 ? (
-          <EmptyState
-            icon={<Bot className="size-6" />}
-            title="No providers yet"
-            description="Add one below or pick a built-in from the dropdown."
-          />
-        ) : (
-          <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
-            {allProviders.map((p) => (
-              <ProviderCard
-                key={p.id}
-                id={p.id}
-                label={p.label}
-                builtin={p.builtin}
-                entry={providers[p.id] ?? {}}
-                isActive={activeProvider === p.id}
-              />
-            ))}
+      {/* ── Providers grid (full width) ───────────────────────────────── */}
+      <Card>
+        <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 border-b border-border p-4">
+          <div>
+            <CardTitle>Providers</CardTitle>
+            <CardDescription>
+              Each card stores its own API key, base URL, and model. The active provider is highlighted.
+            </CardDescription>
           </div>
-        )}
+          <Badge variant="outline">{allProviders.length} total</Badge>
+        </CardHeader>
+        <CardContent className="p-4">
+          {allProviders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center gap-3 border border-dashed border-border p-12 text-center">
+              <Bot className="size-6 text-muted-foreground" />
+              <div>
+                <h3 className="text-sm font-semibold">No providers yet</h3>
+                <p className="mt-1 text-xs text-muted-foreground">Add one below or pick a built-in.</p>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {allProviders.map((p) => (
+                <ProviderCard
+                  key={p.id}
+                  id={p.id}
+                  label={p.label}
+                  builtin={p.builtin}
+                  entry={providers[p.id] ?? {}}
+                  isActive={activeProvider === p.id}
+                  isConfigured={Boolean(providers[p.id]?.apiKey) || p.configured}
+                />
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-        <div className="border-t border-border p-4">
-          <NewProviderInline />
-        </div>
-      </Section>
+      {/* ── Add custom provider card ──────────────────────────────────── */}
+      <NewProviderCard />
     </div>
   );
 }
 
-// ── Subcomponents ──────────────────────────────────────────────────────
+// ── KPI card ───────────────────────────────────────────────────────────
 
-function ActiveProviderSelect({
+function KpiCard({
+  icon,
+  label,
+  value,
+  hint
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  hint?: string;
+}) {
+  return (
+    <Card>
+      <CardHeader className="gap-1 p-3">
+        <CardDescription className="flex items-center gap-2">
+          {icon}
+          {label}
+        </CardDescription>
+        <CardTitle className="text-base">{value}</CardTitle>
+        {hint && <p className="font-mono text-[10px] text-muted-foreground">{hint}</p>}
+      </CardHeader>
+    </Card>
+  );
+}
+
+// ── Active provider card ──────────────────────────────────────────────
+
+function ActiveProviderCard({
   value,
   providers
 }: {
   value?: string;
-  providers: Array<{ id: string; label: string }>;
+  providers: Array<{ id: string; label: string; configured: boolean }>;
 }) {
   const setConfig = useSetConfig();
+  const active = providers.find((p) => p.id === value);
+  const ready = active?.configured ?? false;
+
   return (
-    <Select
-      value={value ?? ''}
-      onChange={(e) => setConfig.mutate({ activeProvider: e.target.value || undefined })}
-      className="w-72"
-    >
-      <option value="">— None —</option>
-      {providers.map((p) => (
-        <option key={p.id} value={p.id}>
-          {p.label}
-        </option>
-      ))}
-    </Select>
+    <Card>
+      <CardHeader className="border-b border-border p-4">
+        <div className="flex items-center gap-2">
+          <Settings2 className="size-3.5 text-muted-foreground" />
+          <CardTitle>Active provider</CardTitle>
+        </div>
+        <CardDescription>Used by default for new sessions.</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3 p-4">
+        <Select
+          value={value ?? ''}
+          onChange={(e) => setConfig.mutate({ activeProvider: e.target.value || undefined })}
+          className="w-full"
+        >
+          <option value="">— None —</option>
+          {providers.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.label} {p.configured ? '✓' : ''}
+            </option>
+          ))}
+        </Select>
+
+        {active ? (
+          <div className="flex items-center justify-between border border-border bg-muted/20 px-3 py-2 text-xs">
+            <div className="flex items-center gap-2">
+              {ready ? (
+                <CircleCheck className="size-3.5 text-success" />
+              ) : (
+                <AlertCircle className="size-3.5 text-warning" />
+              )}
+              <span className="font-medium">{active.label}</span>
+            </div>
+            <span className="font-mono text-[10px] text-muted-foreground">{active.id}</span>
+          </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">No provider selected.</p>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 
-function ResponseModeSelect({ value }: { value: string }) {
+// ── Response behaviour card ────────────────────────────────────────────
+
+function ResponseBehaviorCard({
+  responseMode,
+  maxTokens
+}: {
+  responseMode: string;
+  maxTokens: number;
+}) {
   const setConfig = useSetConfig();
+
   return (
-    <Select
-      value={value}
-      onChange={(e) => setConfig.mutate({ responseMode: e.target.value as 'concise' | 'auto' | 'detailed' })}
-      className="w-72"
-    >
-      <option value="concise">Concise</option>
-      <option value="auto">Auto (match the question)</option>
-      <option value="detailed">Detailed</option>
-    </Select>
+    <Card>
+      <CardHeader className="border-b border-border p-4">
+        <div className="flex items-center gap-2">
+          <Zap className="size-3.5 text-muted-foreground" />
+          <CardTitle>Response behaviour</CardTitle>
+        </div>
+        <CardDescription>How KivX answers during a session.</CardDescription>
+      </CardHeader>
+      <CardContent className="grid grid-cols-2 gap-3 p-4">
+        <div>
+          <Label htmlFor="response-mode" className="text-xs">Mode</Label>
+          <Select
+            id="response-mode"
+            value={responseMode}
+            onChange={(e) =>
+              setConfig.mutate({ responseMode: e.target.value as 'concise' | 'auto' | 'detailed' })
+            }
+            className="mt-1 w-full"
+          >
+            <option value="concise">Concise</option>
+            <option value="auto">Auto</option>
+            <option value="detailed">Detailed</option>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="max-tokens" className="text-xs">Max tokens</Label>
+          <Input
+            id="max-tokens"
+            type="number"
+            min={1}
+            max={1_000_000}
+            value={maxTokens}
+            onChange={(e) => setConfig.mutate({ llm: { maxTokens: Number(e.target.value) } })}
+            className="mt-1 w-full"
+          />
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
-function MaxTokensField() {
-  const config = useConfig();
-  const setConfig = useSetConfig();
-  const value = config.data?.llm?.maxTokens ?? 2048;
-  return (
-    <Input
-      type="number"
-      min={1}
-      max={1_000_000}
-      value={value}
-      onChange={(e) =>
-        setConfig.mutate({ llm: { ...config.data?.llm, maxTokens: Number(e.target.value) } })
-      }
-      className="w-32"
-    />
-  );
-}
+// ── Provider card ──────────────────────────────────────────────────────
 
 function ProviderCard({
   id,
   label,
   builtin,
   entry,
-  isActive
+  isActive,
+  isConfigured
 }: {
   id: string;
   label: string;
   builtin?: boolean;
   entry: ProviderEntry;
   isActive: boolean;
+  isConfigured: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -224,20 +349,28 @@ function ProviderCard({
 
   return (
     <>
-      <Card className={isActive ? 'border-foreground' : undefined}>
-        <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
-          <div className="flex flex-col gap-1">
-            <CardTitle className="flex items-center gap-2">
-              {label}
+      <Card
+        className={
+          isActive
+            ? 'border-foreground'
+            : isConfigured
+              ? 'border-border'
+              : 'border-dashed border-border'
+        }
+      >
+        <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 p-3">
+          <div className="flex min-w-0 flex-col gap-1">
+            <CardTitle className="flex items-center gap-1.5 truncate text-sm">
+              <span className="truncate">{label}</span>
               {isActive && (
-                <Badge variant="default" className="gap-1">
+                <Badge variant="default" className="gap-1 shrink-0">
                   <Star className="size-3" /> Active
                 </Badge>
               )}
-              {builtin && <Badge variant="outline">built-in</Badge>}
             </CardTitle>
-            <CardDescription>
-              <span className="font-mono text-[10px]">{id}</span>
+            <CardDescription className="flex items-center gap-1.5 font-mono text-[10px]">
+              <span className="truncate">{id}</span>
+              {builtin && <Badge variant="outline" className="shrink-0">built-in</Badge>}
             </CardDescription>
           </div>
           <ProbeBadge
@@ -248,14 +381,25 @@ function ProviderCard({
           />
         </CardHeader>
 
-        <CardContent className="flex flex-col gap-3">
+        <CardContent className="flex flex-col gap-2 p-3 pt-0">
+          {!isConfigured && !open && (
+            <p className="border border-dashed border-border px-2 py-1.5 text-[11px] text-muted-foreground">
+              No API key yet — click Edit to configure.
+            </p>
+          )}
+
           {!open ? (
             <div className="flex flex-wrap gap-1.5">
-              <Button size="sm" variant="outline" onClick={() => setOpen(true)} leftIcon={<Pencil className="size-3" />}>
+              <Button
+                size="sm"
+                variant={isActive ? 'outline' : 'primary'}
+                onClick={() => setOpen(true)}
+                leftIcon={<Pencil className="size-3" />}
+              >
                 Edit
               </Button>
               {!isActive && (
-                <Button size="sm" variant="primary" onClick={makeActive}>
+                <Button size="sm" variant="secondary" onClick={makeActive}>
                   Activate
                 </Button>
               )}
@@ -275,14 +419,9 @@ function ProviderCard({
           )}
 
           {open && (
-            <div className="flex items-center justify-end gap-2 border-t border-border pt-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                rightIcon={<ChevronUp className="size-3" />}
-                onClick={() => setOpen(false)}
-              >
-                Hide fields
+            <div className="flex items-center justify-end gap-1.5 border-t border-border pt-2">
+              <Button variant="ghost" size="sm" onClick={() => setOpen(false)} rightIcon={<ChevronUp className="size-3" />}>
+                Hide
               </Button>
               <Button variant="outline" size="sm" onClick={() => setDraft(entry)} disabled={!isDirty}>
                 Discard
@@ -316,9 +455,11 @@ function ProviderFormFields({
   onChange: (v: ProviderEntry) => void;
 }) {
   return (
-    <div className="flex flex-col gap-2.5">
+    <div className="flex flex-col gap-2 border-t border-border pt-2">
       <div>
-        <Label htmlFor={`apiKey-${entry.id ?? ''}`}>API key</Label>
+        <Label htmlFor={`apiKey-${entry.id ?? ''}`} className="text-xs">
+          <KeyRound className="mr-1 inline size-3" /> API key
+        </Label>
         <Input
           id={`apiKey-${entry.id ?? ''}`}
           type="password"
@@ -330,7 +471,7 @@ function ProviderFormFields({
         />
       </div>
       <div>
-        <Label htmlFor={`baseURL-${entry.id ?? ''}`}>Base URL</Label>
+        <Label htmlFor={`baseURL-${entry.id ?? ''}`} className="text-xs">Base URL</Label>
         <Input
           id={`baseURL-${entry.id ?? ''}`}
           type="url"
@@ -341,7 +482,7 @@ function ProviderFormFields({
         />
       </div>
       <div>
-        <Label htmlFor={`model-${entry.id ?? ''}`}>Model</Label>
+        <Label htmlFor={`model-${entry.id ?? ''}`} className="text-xs">Model</Label>
         <Input
           id={`model-${entry.id ?? ''}`}
           value={entry.model ?? ''}
@@ -351,7 +492,7 @@ function ProviderFormFields({
         />
       </div>
       <div>
-        <Label htmlFor={`path-${entry.id ?? ''}`}>Chat completions path (optional)</Label>
+        <Label htmlFor={`path-${entry.id ?? ''}`} className="text-xs">Chat completions path (optional)</Label>
         <Input
           id={`path-${entry.id ?? ''}`}
           value={entry.chatCompletionsPath ?? ''}
@@ -379,7 +520,6 @@ function ProbeBadge({
     return (
       <Badge variant="info" className="gap-1">
         <Loader2 className="size-3 animate-spin" />
-        Probing
       </Badge>
     );
   }
@@ -388,7 +528,7 @@ function ProbeBadge({
     | undefined;
   if (!s || s.status === 'idle' || s.status === 'cached') {
     return (
-      <Button size="sm" variant="ghost" onClick={onProbe}>
+      <Button size="sm" variant="ghost" onClick={onProbe} className="h-6 px-1.5 text-[10px]">
         Test
       </Button>
     );
@@ -399,7 +539,7 @@ function ProbeBadge({
         type="button"
         onClick={onReprobe}
         title={`Last tested ${new Date(s.probedAt ?? 0).toLocaleString()}`}
-        className="inline-flex items-center gap-1 text-xs text-success transition-opacity hover:opacity-70"
+        className="inline-flex items-center gap-1 text-[10px] text-success transition-opacity hover:opacity-70"
       >
         <Check className="size-3" />
         {s.latencyMs ? `${s.latencyMs}ms` : 'OK'}
@@ -411,7 +551,7 @@ function ProbeBadge({
       <button
         type="button"
         onClick={onReprobe}
-        className="inline-flex items-center gap-1 text-xs text-destructive transition-opacity hover:opacity-70"
+        className="inline-flex items-center gap-1 text-[10px] text-destructive transition-opacity hover:opacity-70"
       >
         <AlertCircle className="size-3" />
         {s.message ?? 'Failed'}
@@ -422,7 +562,9 @@ function ProbeBadge({
   return null;
 }
 
-function NewProviderInline() {
+// ── Add custom provider card ───────────────────────────────────────────
+
+function NewProviderCard() {
   const [value, setValue] = useState('');
   const setConfig = useSetConfig();
   const qc = useQueryClient();
@@ -444,29 +586,41 @@ function NewProviderInline() {
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <Input
-        ref={inputRef}
-        value={value}
-        onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '-'))}
-        placeholder="custom-provider-id"
-        className="w-64"
-        onKeyDown={(e) => e.key === 'Enter' && add()}
-      />
-      <Button
-        size="sm"
-        variant="primary"
-        disabled={!value}
-        leftIcon={<Plus className="size-3.5" />}
-        onClick={add}
-        loading={setConfig.isPending}
-      >
-        Add provider
-      </Button>
-    </div>
+    <Card>
+      <CardHeader className="border-b border-border p-4">
+        <div className="flex items-center gap-2">
+          <CirclePlus className="size-3.5 text-muted-foreground" />
+          <CardTitle>Add custom provider</CardTitle>
+        </div>
+        <CardDescription>
+          Use a non-default LLM endpoint — a private gateway, a self-hosted model, or a third-party
+          OpenAI-compatible service.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2">
+          <Input
+            ref={inputRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, '-'))}
+            placeholder="custom-provider-id"
+            className="flex-1"
+            onKeyDown={(e) => e.key === 'Enter' && add()}
+          />
+          <Button
+            variant="primary"
+            disabled={!value}
+            leftIcon={<Plus className="size-3.5" />}
+            onClick={add}
+            loading={setConfig.isPending}
+          >
+            Add provider
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 void useMemo;
 void useMutation;
-void ChevronDown;
