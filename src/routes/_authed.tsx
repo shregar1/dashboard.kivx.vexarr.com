@@ -24,16 +24,9 @@ const SETTINGS_NAV: NavItem[] = [
   { to: '/settings/data', label: 'Data', icon: Database }
 ];
 
-// Sessions uses the global Workspace nav (see HOME_NAV below) — it
-// doesn't need its own per-page sidebar. The search / orphans /
-// export affordances all live inside the page itself.
-
-// Personality is a single page with internal tabs — no per-page sub-nav
-// needed. The Overview / Dimensions / Do & Don't sections live inside
-// the page itself.
-const PERSONALITY_NAV: NavItem[] = [
-  { to: '/personality', label: 'Personality', icon: Sparkles }
-];
+// Sessions and Personality are single-page destinations, not
+// sections with sub-pages. They share the global Workspace nav
+// (personality has internal tabs, sessions has the in-page search).
 
 const DIAGNOSTICS_NAV: NavItem[] = [
   { to: '/diagnostics', label: 'Status', icon: Activity }
@@ -51,14 +44,12 @@ function useNavForCurrentPath(pathname: string): { title: string; items: NavItem
   if (pathname.startsWith('/settings')) {
     return { title: 'Settings', items: SETTINGS_NAV };
   }
-  if (pathname.startsWith('/personality')) {
-    return { title: 'Personality', items: PERSONALITY_NAV };
-  }
   if (pathname.startsWith('/diagnostics')) {
     return { title: 'Diagnostics', items: DIAGNOSTICS_NAV };
   }
-  // /sessions and the home dashboard share the global Workspace nav
-  // — sessions is its own destination, not a section with sub-pages.
+  // /sessions, /personality and the home dashboard share the global
+  // Workspace nav — both are single-page destinations, not sections
+  // with sub-pages (personality has internal tabs instead).
   return { title: 'Workspace', items: HOME_NAV };
 }
 
