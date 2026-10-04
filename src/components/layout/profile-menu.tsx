@@ -8,8 +8,7 @@ import {
   HelpCircle,
   LogOut,
   ChevronUp,
-  Pencil,
-  Sparkles
+  Pencil
 } from 'lucide-react';
 
 import { Menu, MenuItem, MenuLabel, MenuLink, MenuSeparator, Avatar } from '@/components/ui/menu';
@@ -118,33 +117,6 @@ export function ProfileMenu() {
       >
         <User className="size-3.5" />
         Edit profile
-      </MenuItem>
-
-      <MenuSeparator />
-
-      {/* Subscription */}
-      <MenuLabel>Subscription</MenuLabel>
-      <MenuItem
-        onClick={() => {
-          setOpen(false);
-          toast({ variant: 'info', title: 'Opening KivX account…' });
-          void ipc.openExternal('https://kivx.ai/account');
-        }}
-      >
-        <Sparkles className="size-3.5" />
-        Manage plan
-      </MenuItem>
-      <MenuItem
-        onClick={() => {
-          setOpen(false);
-          toast({ variant: 'info', title: 'Rotating API key…' });
-          // The actual rotation is a host-side flow; we just navigate
-          // to the auth flow surface.
-          void ipc.kivCreateApiKey({ rotate: true }).catch(() => {});
-        }}
-      >
-        <KeyRound className="size-3.5" />
-        Rotate API key
       </MenuItem>
 
       <MenuSeparator />

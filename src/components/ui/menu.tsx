@@ -20,20 +20,20 @@ interface MenuProps {
 export function Menu({
   trigger,
   children,
-  align = 'end',
+  align = 'start',
   side = 'top',
   className
 }: MenuProps) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
     const onPointer = (e: PointerEvent) => {
       const target = e.target as Node;
-      if (ref.current?.contains(target)) return;
-      if (triggerRef.current?.contains(target)) return;
+      if (wrapperRef.current?.contains(target)) return;
+      if (menuRef.current?.contains(target)) return;
       setOpen(false);
     };
     const onKey = (e: KeyboardEvent) => {
@@ -48,25 +48,31 @@ export function Menu({
   }, [open]);
 
   return (
-    <>
+    <div ref={wrapperRef} className="relative w-full">
       <div
-        ref={triggerRef}
         onClick={() => setOpen((v) => !v)}
         className="cursor-pointer"
       >
         {trigger}
       </div>
+
       {open && (
         <>
-          {/* Click-outside scrim — invisible, doesn't dim the page. */}
-          <div className="fixed inset-0 z-40" aria-hidden onClick={() => setOpen(false)} />
+          {/* Backdrop — covers the page so any click outside the
+              menu closes it. Z-index sits between the shell and the
+              menu itself. */}
           <div
-            ref={ref}
+            className="fixed inset-0 z-40"
+            aria-hidden
+            onClick={() => setOpen(false)}
+          />
+          <div
+            ref={menuRef}
             role="menu"
             className={cn(
-              'fixed z-50 min-w-[220px] border border-border bg-card text-card-foreground animate-slide-up',
-              align === 'end' ? 'right-2' : 'left-2',
-              side === 'top' ? 'bottom-12' : 'top-12',
+              'absolute z-50 min-w-[220px] border border-border bg-card text-card-foreground animate-slide-up',
+              align === 'end' ? 'right-0' : 'left-0',
+              side === 'top' ? 'bottom-full mb-1' : 'top-full mt-1',
               className
             )}
           >
@@ -74,7 +80,7 @@ export function Menu({
           </div>
         </>
       )}
-    </>
+    </div>
   );
 }
 
