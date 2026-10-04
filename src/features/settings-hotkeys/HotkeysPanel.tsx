@@ -195,7 +195,7 @@ function BindingButton({
   onClick: () => void;
   onClear?: () => void;
 }) {
-  const isOverridden = value && value !== defaultValue;
+  const isOverridden = Boolean(value) && value !== defaultValue;
 
   return (
     <div className="group flex items-center gap-2">
