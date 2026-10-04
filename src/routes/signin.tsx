@@ -101,7 +101,7 @@ function SigninPage() {
       });
 
       setProfile({ lastSyncedAt: Date.now() });
-      void navigate({ to: '/settings/llm' });
+      void navigate({ to: '/' });
     } catch (e) {
       toast({ variant: 'error', title: 'Sign-in failed', description: String(e) });
     } finally {
@@ -114,7 +114,7 @@ function SigninPage() {
     // local-only mode (sessions, settings, personality) but the
     // remote features stay gated until they sign in.
     setProfile({ displayName: 'Guest', email: '' });
-    void navigate({ to: '/settings/llm' });
+    void navigate({ to: '/' });
   }
 
   return (
