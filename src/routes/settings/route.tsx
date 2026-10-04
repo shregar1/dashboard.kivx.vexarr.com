@@ -1,6 +1,6 @@
 import { createRoute, Outlet } from '@tanstack/react-router';
 
-import { Route as RootRoute } from '@/routes/__root';
+import { Route as AuthedRoute } from '@/routes/_authed';
 import { PageContent } from '@/components/layout/page';
 
 /**
@@ -8,7 +8,7 @@ import { PageContent } from '@/components/layout/page';
  * the Settings sub-sections, so this layout is just a content frame.
  */
 export const Route = createRoute({
-  getParentRoute: () => RootRoute,
+  getParentRoute: () => AuthedRoute,
   path: 'settings',
   component: SettingsLayout
 });
