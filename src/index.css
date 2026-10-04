@@ -35,10 +35,14 @@
     --input: 240 6% 88%;
     --ring: 252 87% 60%;
     --radius: 10px;
-    --sidebar: 240 10% 12%;
-    --sidebar-foreground: 0 0% 96%;
-    --sidebar-accent: 240 6% 18%;
-    --sidebar-border: 240 6% 22%;
+    /* Sidebar in light mode: a slightly cooler off-white card, darker
+       text, soft border. Previously the sidebar was hardcoded dark in
+       both modes — light-mode users got a chrome sidebar that didn't
+       match the rest of the UI. */
+    --sidebar: 0 0% 100%;
+    --sidebar-foreground: 240 10% 12%;
+    --sidebar-accent: 240 5% 94%;
+    --sidebar-border: 240 6% 88%;
   }
 
   .dark {
