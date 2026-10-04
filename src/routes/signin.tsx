@@ -110,10 +110,11 @@ function SigninPage() {
   }
 
   function skipForNow() {
-    // Set a guest profile without a key — the dashboard works in
-    // local-only mode (sessions, settings, personality) but the
-    // remote features stay gated until they sign in.
-    setProfile({ displayName: 'Guest', email: '' });
+    // Local-only mode: mark the user as authenticated with a guest
+    // profile so the _authed layout's redirect doesn't bounce them
+    // back to /signin. The empty apiKey means any host-side call
+    // that requires auth will fail with a clear error.
+    signIn({ apiKey: '', email: '', displayName: 'Guest', plan: 'free' });
     void navigate({ to: '/' });
   }
 
