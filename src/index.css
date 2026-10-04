@@ -10,11 +10,11 @@
 @tailwind utilities;
 
 @layer base {
-  /* Minimal B/W palette. Pure black + pure white with a single
-     sharp electric-blue accent for the one affordance per screen that
-     should pull attention. Borders are black/white at low opacity
-     so the design stays flat. Status colours stay semantic (red/green/
-     amber) but desaturated. */
+  /* Minimal B/W palette. Pure black + pure white. No accent colour —
+     active states use the foreground (black in light, white in dark)
+     as their fill so the design stays strictly bichromatic. Status
+     colours (success/warning/destructive) stay semantic but
+     desaturated. */
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 0%;
@@ -28,10 +28,10 @@
     --secondary-foreground: 0 0% 0%;
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 40%;
-    /* Single accent — sharp electric blue. Used sparingly: the
-       active sidebar item, the "send" / "activate" button, focus
-       rings, and a few KPI bars. */
-    --accent: 220 90% 50%;
+    /* Accent = foreground — active states invert to the same black/white
+       pair the primary button uses. This is what "minimal B/W" really
+       looks like: one contrast pair, no second hue. */
+    --accent: 0 0% 0%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 72% 45%;
     --destructive-foreground: 0 0% 100%;
@@ -41,11 +41,11 @@
     --warning-foreground: 0 0% 100%;
     --border: 0 0% 0% / 0.12;
     --input: 0 0% 0% / 0.12;
-    --ring: 220 90% 50%;
+    --ring: 0 0% 0%;
     --radius: 4px;
     --sidebar: 0 0% 100%;
     --sidebar-foreground: 0 0% 0%;
-    --sidebar-accent: 220 90% 50%;
+    --sidebar-accent: 0 0% 0%;
     --sidebar-border: 0 0% 0% / 0.12;
   }
 
@@ -62,7 +62,7 @@
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 12%;
     --muted-foreground: 0 0% 65%;
-    --accent: 220 90% 60%;
+    --accent: 0 0% 100%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 100%;
@@ -72,10 +72,10 @@
     --warning-foreground: 0 0% 0%;
     --border: 0 0% 100% / 0.14;
     --input: 0 0% 100% / 0.14;
-    --ring: 220 90% 60%;
+    --ring: 0 0% 100%;
     --sidebar: 0 0% 0%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-accent: 220 90% 60%;
+    --sidebar-accent: 0 0% 100%;
     --sidebar-border: 0 0% 100% / 0.14;
   }
 
