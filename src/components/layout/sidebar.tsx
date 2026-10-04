@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import {
-  Settings,
   History,
   Sparkles,
   Activity,
@@ -23,7 +22,6 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { to: '/settings', label: 'Settings', icon: Settings, group: 'main' },
   { to: '/sessions', label: 'Sessions', icon: History, group: 'main' },
   { to: '/personality', label: 'Personality', icon: Sparkles, group: 'main' },
   { to: '/diagnostics', label: 'Diagnostics', icon: Activity, group: 'main' },
