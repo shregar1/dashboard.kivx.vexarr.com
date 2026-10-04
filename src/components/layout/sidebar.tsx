@@ -1,10 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import {
-  History,
-  Sparkles,
-  Activity,
-  Bug,
-  Cpu,
   PanelLeftClose,
   PanelLeftOpen,
   type LucideIcon
@@ -12,40 +7,34 @@ import {
 import { cn } from '@/lib/utils';
 import { useUi } from '@/stores/ui-store';
 
+import { usePageNav, type NavItem } from './page-nav-context';
 import { ProfileMenu } from './profile-menu';
-
-interface NavItem {
-  to: string;
-  label: string;
-  icon: LucideIcon;
-  group: 'main' | 'debug';
-}
-
-const NAV: NavItem[] = [
-  { to: '/sessions', label: 'Sessions', icon: History, group: 'main' },
-  { to: '/personality', label: 'Personality', icon: Sparkles, group: 'main' },
-  { to: '/diagnostics', label: 'Diagnostics', icon: Activity, group: 'main' },
-  { to: '/diagnostics/bug-report', label: 'Bug report', icon: Bug, group: 'debug' },
-  { to: '/diagnostics/processes', label: 'Processes', icon: Cpu, group: 'debug' }
-];
 
 export function Sidebar() {
   const collapsed = useUi((s) => s.sidebarCollapsed);
   const toggle = useUi((s) => s.toggleSidebar);
-  const devMode = useUi((s) => s.devMode);
+  const pageNav = usePageNav();
+
+  // Group items by their `group` field (defaults to "main"). Lets a
+  // page declare debug items that render in a second section.
+  const groups = groupItems(pageNav?.items ?? []);
 
   return (
     <aside
       className={cn(
         'flex h-full shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground',
         'transition-[width] duration-150',
-        collapsed ? 'w-[56px]' : 'w-[220px]'
+        collapsed ? 'w-[200px]' : 'w-[260px]'
       )}
     >
       <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-2">
-        <div className="flex size-7 shrink-0 items-center justify-center bg-foreground font-mono text-sm font-bold text-background">
+        <Link
+          to="/"
+          className="flex size-7 shrink-0 items-center justify-center bg-foreground font-mono text-sm font-bold text-background"
+          aria-label="KivX — Home"
+        >
           K
-        </div>
+        </Link>
         {!collapsed && (
           <div className="flex flex-1 flex-col leading-none">
             <span className="text-sm font-semibold tracking-tight">KivX</span>
@@ -65,42 +54,32 @@ export function Sidebar() {
         </button>
       </div>
 
+      {/* Per-page nav — set by the active route via PageNavProvider.
+          Renders nothing when the page doesn't declare its own nav. */}
       <nav className="flex-1 overflow-y-auto px-2 py-3">
-        <ul className="flex flex-col gap-0.5">
-          {NAV.filter((n) => n.group === 'main' || devMode).map((item) => (
-            <li key={item.to}>
-              <Link
-                to={item.to}
-                className="group flex h-8 items-center gap-2.5 px-2 text-sm text-sidebar-foreground/70 transition-colors hover:bg-secondary hover:text-foreground aria-[current=page]:bg-accent aria-[current=page]:text-accent-foreground aria-[current=page]:font-semibold"
-              >
-                <item.icon className="size-4 shrink-0" />
-                {!collapsed && <span className="truncate">{item.label}</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        {devMode && (
-          <>
-            {!collapsed && (
-              <div className="mt-6 mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Debug
+        {pageNav && pageNav.items.length > 0 ? (
+          <div className="flex flex-col gap-4">
+            {pageNav.title && !collapsed && (
+              <div className="px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {pageNav.title}
               </div>
             )}
-            <ul className="flex flex-col gap-0.5">
-              {NAV.filter((n) => n.group === 'debug').map((item) => (
-                <li key={item.to}>
-                  <Link
-                    to={item.to}
-                    className="group flex h-8 items-center gap-2.5 px-2 text-sm text-sidebar-foreground/70 transition-colors hover:bg-secondary hover:text-foreground aria-[current=page]:bg-accent aria-[current=page]:text-accent-foreground aria-[current=page]:font-semibold"
-                  >
-                    <item.icon className="size-4 shrink-0" />
-                    {!collapsed && <span className="truncate">{item.label}</span>}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </>
+            <NavList items={groups.main} />
+            {groups.debug.length > 0 && (
+              <>
+                {!collapsed && (
+                  <div className="mt-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    Debug
+                  </div>
+                )}
+                <NavList items={groups.debug} />
+              </>
+            )}
+          </div>
+        ) : (
+          !collapsed && (
+            <p className="px-2 text-xs text-muted-foreground">No section selected.</p>
+          )
         )}
       </nav>
 
@@ -110,3 +89,33 @@ export function Sidebar() {
     </aside>
   );
 }
+
+function NavList({ items }: { items: NavItem[] }) {
+  return (
+    <ul className="flex flex-col gap-0.5">
+      {items.map((item) => (
+        <li key={`${item.to}-${item.label}`}>
+          <Link
+            to={item.to}
+            className="flex h-8 items-center gap-2.5 px-2 text-sm text-sidebar-foreground/70 transition-colors hover:bg-secondary hover:text-foreground aria-[current=page]:bg-accent aria-[current=page]:text-accent-foreground aria-[current=page]:font-semibold"
+          >
+            <item.icon className="size-4 shrink-0" />
+            <span className="truncate">{item.label}</span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function groupItems(items: NavItem[]): { main: NavItem[]; debug: NavItem[] } {
+  const main: NavItem[] = [];
+  const debug: NavItem[] = [];
+  for (const it of items) {
+    if (it.group === 'debug') debug.push(it);
+    else main.push(it);
+  }
+  return { main, debug };
+}
+
+void useUi;
