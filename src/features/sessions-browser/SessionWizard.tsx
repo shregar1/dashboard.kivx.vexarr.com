@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import React, { useState, type FormEvent } from 'react';
 import {
   Briefcase,
   FileText,
@@ -52,6 +52,55 @@ const STEPS: Array<{ id: StepId; title: string; description: string; placeholder
 ];
 
 const MAX_LEN = 500_000;
+
+/**
+ * Isolated textarea wrapper.
+ *
+ * The wizard re-renders on every keystroke (controlled inputs always
+ * do), and a bunch of parent hooks (TanStack Query mutations, the
+ * useSetConfig mutation status, etc.) re-render with it. The default
+ * React reconciler handles that fine — but the Dialog primitive
+ * had a useEffect that ran `ref.current?.focus()` on the card div
+ * to set up keyboard focus on open. If anything else in the parent
+ * tree (or in React's effect ordering) ever caused that effect to
+ * re-fire after the textarea was mounted, focus would jump out of
+ * the textarea and into the card.
+ *
+ * Wrapping the textarea in its own component with a `key` keyed by
+ * the step id gives us two guarantees:
+ *   1. The textarea is fully remounted on step change, so the
+ *      autoFocus + selection is always at the top.
+ *   2. Between re-renders, the textarea is the *same* DOM element,
+ *      so React preserves the user's cursor and IME composition.
+ *
+ * `React.memo` skips re-rendering this component when the parent's
+ * other state (stepper, footer, character counter) changes — only
+ * `value` and `onChange` matter to the textarea itself.
+ */
+const WizardTextarea = React.memo(function WizardTextarea({
+  value,
+  onChange,
+  placeholder,
+  maxLength
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  maxLength: number;
+}) {
+  return (
+    <Textarea
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      rows={16}
+      maxLength={maxLength}
+      autoFocus
+      spellCheck={false}
+      className="min-h-[280px] font-mono text-xs"
+    />
+  );
+});
 
 export function SessionWizard({ open, onOpenChange }: SessionWizardProps) {
   const [stepIdx, setStepIdx] = useState(0);
@@ -161,13 +210,12 @@ export function SessionWizard({ open, onOpenChange }: SessionWizardProps) {
 
           {/* Step body */}
           <p className="mb-2 text-sm text-muted-foreground">{step.description}</p>
-          <Textarea
+          <WizardTextarea
+            key={step.id}
             value={value}
-            onChange={(e) => setValueFor(step.id, e.target.value)}
+            onChange={(v) => setValueFor(step.id, v)}
             placeholder={step.placeholder}
-            rows={16}
-            className="min-h-[280px] font-mono text-xs"
-            autoFocus
+            maxLength={MAX_LEN}
           />
           <div className="mt-1 flex items-center justify-between font-mono text-[10px] text-muted-foreground">
             <span>{step.id === 'guidelines' ? 'optional' : 'required'}</span>
