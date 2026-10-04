@@ -31,13 +31,17 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
   // hoists the modal out of any stacking-context trap (the Shell uses
   // `overflow-hidden` which creates a new context, so a non-portaled
   // fixed-position dialog can be silently clipped or non-clickable).
+  //
+  // Order matters: backdrop first, card on top. Same-z-index elements
+  // stack in DOM order — putting the backdrop after the card would let
+  // it intercept clicks meant for the card content.
   return (
     <DialogContext.Provider value={{ open, setOpen: onOpenChange }}>
       {open &&
         createPortal(
           <>
-            {children}
             <DialogBackdrop onDismiss={() => onOpenChange(false)} />
+            {children}
           </>,
           document.body
         )}
@@ -48,7 +52,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
 function DialogBackdrop({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div
-      className="fixed inset-0 z-50 bg-foreground/40 animate-fade-in"
+      className="fixed inset-0 z-50 bg-foreground/50 backdrop-blur-sm animate-fade-in"
       onClick={onDismiss}
       aria-hidden
     />
@@ -86,10 +90,18 @@ export function DialogContent({
   }[size];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      onClick={(e) => {
+        // Click on the wrapper background (not the card itself) closes
+        // the dialog. The card has its own stopPropagation handler below.
+        if (e.target === e.currentTarget) ctx.setOpen(false);
+      }}
+    >
       <div
         ref={ref}
         tabIndex={-1}
+        onClick={(e) => e.stopPropagation()}
         className={cn(
           'relative w-full border border-border bg-card text-card-foreground animate-slide-up focus:outline-none',
           sizeClass,
