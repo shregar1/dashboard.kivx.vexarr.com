@@ -72,14 +72,30 @@ export function DialogContent({
   const ref = useRef<HTMLDivElement>(null);
   const isOpen = ctx.open;
 
+  // Track the last-seen `open` value so we only run the effect on the
+  // open→open transition. `ctx.setOpen` is a new function on every
+  // parent render — if it were in the deps array the effect would
+  // re-fire on every keystroke inside the dialog (every state update
+  // in a controlled textarea), call `ref.current.focus()` on the
+  // card div, and steal focus from whatever input the user is
+  // typing into.
+  const wasOpen = useRef(false);
   useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') ctx.setOpen(false);
-    };
-    document.addEventListener('keydown', onKey);
-    ref.current?.focus();
-    return () => document.removeEventListener('keydown', onKey);
+    if (isOpen && !wasOpen.current) {
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') ctx.setOpen(false);
+      };
+      document.addEventListener('keydown', onKey);
+      ref.current?.focus();
+      wasOpen.current = true;
+      return () => {
+        document.removeEventListener('keydown', onKey);
+        wasOpen.current = false;
+      };
+    }
+    if (!isOpen) {
+      wasOpen.current = false;
+    }
   }, [isOpen, ctx.setOpen]);
 
   const sizeClass = {
