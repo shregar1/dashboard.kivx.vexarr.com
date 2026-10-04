@@ -24,9 +24,26 @@ import { fullConfigSchema, type FullConfig } from '@/schemas/config';
 const DEFAULT_HOST = 'http://127.0.0.1:7711';
 
 let baseUrl = DEFAULT_HOST;
+let authToken: string | null = null;
+
 try {
+  // 1. localStorage (user-set via "Set host" screen).
   const stored = window.localStorage.getItem('kivx.dashboard.host');
   if (stored) baseUrl = stored;
+  // 2. Persisted auth token.
+  const tok = window.localStorage.getItem('kivx.dashboard.token');
+  if (tok) authToken = tok;
+  // 3. Meta tag injected by the desktop bridge when serving the SPA
+  //    from the same origin (production deploy).
+  const meta = document.querySelector<HTMLMetaElement>('meta[name="kivx-bridge-token"]');
+  if (meta?.content) {
+    authToken = meta.content;
+    try {
+      window.localStorage.setItem('kivx.dashboard.token', meta.content);
+    } catch {
+      /* ignore */
+    }
+  }
 } catch {
   /* localStorage unavailable — fall back to default */
 }
@@ -40,8 +57,21 @@ export function setKivxHost(url: string): void {
   }
 }
 
+export function setAuthToken(token: string): void {
+  authToken = token;
+  try {
+    window.localStorage.setItem('kivx.dashboard.token', token);
+  } catch {
+    /* ignore */
+  }
+}
+
 export function getKivxHost(): string {
   return baseUrl;
+}
+
+export function getAuthToken(): string | null {
+  return authToken;
 }
 
 export class IpcError extends Error {
@@ -56,9 +86,12 @@ export class IpcError extends Error {
 }
 
 async function ipcInvoke<T>(channel: string, ...args: unknown[]): Promise<T> {
+  const headers: Record<string, string> = { 'content-type': 'application/json' };
+  if (authToken) headers.authorization = `Bearer ${authToken}`;
+
   const res = await fetch(`${baseUrl}/ipc/${channel}`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers,
     body: JSON.stringify({ args })
   });
   if (!res.ok) {
@@ -217,7 +250,13 @@ type Listener<T> = (payload: T) => void;
 
 export function subscribe<T>(channel: string, listener: Listener<T>): () => void {
   const url = `${baseUrl}/ipc/stream/${encodeURIComponent(channel)}`;
-  const es = new EventSource(url, { withCredentials: false });
+  // EventSource can't set Authorization headers natively. We append
+  // the token as a query string for SSE — the bridge accepts it from
+  // the loopback URL because there's no way to attach a header from
+  // a browser-side EventSource. (`same-origin` production deploys share
+  // the auth meta tag, so this is only used as a fallback for dev.)
+  const finalUrl = authToken ? `${url}?token=${encodeURIComponent(authToken)}` : url;
+  const es = new EventSource(finalUrl, { withCredentials: false });
 
   const handler = (evt: MessageEvent<string>) => {
     try {
