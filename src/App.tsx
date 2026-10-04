@@ -18,13 +18,13 @@ import { Route as SettingsDataRoute } from '@/routes/settings/data';
 import { Route as SessionsRoute } from '@/routes/sessions/route';
 import { Route as SessionsIndexRoute } from '@/routes/sessions/index';
 import { Route as SessionDetailRoute } from '@/routes/sessions/$urn';
-import { Route as PersonalityRoute, Route as PersonalityIndexRoute } from '@/routes/personality/index';
+import { Route as PersonalityRoute } from '@/routes/personality/route';
+import { Route as PersonalityIndexRoute } from '@/routes/personality/index';
 import { Route as PersonalityOverviewRoute } from '@/routes/personality/overview';
 import { Route as PersonalityDimensionsRoute } from '@/routes/personality/dimensions';
 import { Route as PersonalityRulesRoute } from '@/routes/personality/do-dont';
 import { Route as DiagnosticsRoute } from '@/routes/diagnostics/index';
 import { Route as BugReportRoute } from '@/routes/diagnostics/bug-report';
-import { Route as ProcessesRoute } from '@/routes/diagnostics/processes';
 
 const routeTree = RootRoute.addChildren([
   SigninRoute,
@@ -45,7 +45,7 @@ const routeTree = RootRoute.addChildren([
       PersonalityDimensionsRoute,
       PersonalityRulesRoute
     ]),
-    DiagnosticsRoute.addChildren([BugReportRoute, ProcessesRoute])
+    DiagnosticsRoute.addChildren([BugReportRoute])
   ])
 ]);
 

@@ -9,8 +9,7 @@ import {
   Activity,
   History,
   Sparkles,
-  Bug,
-  Cpu
+  Bug
 } from 'lucide-react';
 
 import { Route as RootRoute } from '@/routes/__root';
@@ -38,7 +37,6 @@ const PERSONALITY_NAV: NavItem[] = [
 
 const DIAGNOSTICS_NAV: NavItem[] = [
   { to: '/diagnostics', label: 'Status', icon: Activity },
-  { to: '/diagnostics/processes', label: 'Processes', icon: Cpu },
   { to: '/diagnostics/bug-report', label: 'Bug report', icon: Bug, group: 'debug' }
 ];
 
