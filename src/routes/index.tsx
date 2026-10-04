@@ -1,11 +1,19 @@
-import { createRoute, redirect } from '@tanstack/react-router';
+import { createRoute } from '@tanstack/react-router';
 
-import { Route as RootRoute } from './__root';
+import { Route as AuthedRoute } from './_authed';
+import { PageContent } from '@/components/layout/page';
+import { DashboardHome } from '@/features/dashboard-home/DashboardHome';
 
 export const Route = createRoute({
-  getParentRoute: () => RootRoute,
+  getParentRoute: () => AuthedRoute,
   path: '/',
-  beforeLoad: () => {
-    throw redirect({ to: '/settings' });
-  }
+  component: HomePage
 });
+
+function HomePage() {
+  return (
+    <PageContent>
+      <DashboardHome />
+    </PageContent>
+  );
+}

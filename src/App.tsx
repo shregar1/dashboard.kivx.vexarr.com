@@ -24,9 +24,9 @@ import { Route as BugReportRoute } from '@/routes/diagnostics/bug-report';
 import { Route as ProcessesRoute } from '@/routes/diagnostics/processes';
 
 const routeTree = RootRoute.addChildren([
-  IndexRoute,
   SigninRoute,
   AuthedRoute.addChildren([
+    IndexRoute,
     SettingsRoute.addChildren([
       SettingsLlmRoute,
       SettingsAudioRoute,
