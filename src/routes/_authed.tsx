@@ -1,14 +1,11 @@
-import { createRoute, Outlet } from '@tanstack/react-router';
+import { createRoute, Outlet, useLocation, useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
-import { useRouter } from '@tanstack/react-router';
 import {
   Settings2,
   Volume2,
   Keyboard,
   Database,
-  Camera,
   Mic,
-  AudioLines,
   Activity,
   History,
   Search,
@@ -27,10 +24,8 @@ const SETTINGS_NAV: NavItem[] = [
   { to: '/settings/llm', label: 'LLM providers', icon: Settings2 },
   { to: '/settings/audio', label: 'Audio', icon: Volume2 },
   { to: '/settings/stt', label: 'Speech-to-text', icon: Mic },
-  { to: '/settings/tts', label: 'Text-to-speech', icon: AudioLines },
   { to: '/settings/hotkeys', label: 'Hotkeys', icon: Keyboard },
   { to: '/settings/data', label: 'Data', icon: Database },
-  { to: '/settings/camera', label: 'Virtual camera', icon: Camera },
   { to: '/settings/telemetry', label: 'Telemetry', icon: Activity }
 ];
 
@@ -41,9 +36,9 @@ const SESSIONS_NAV: NavItem[] = [
 ];
 
 const PERSONALITY_NAV: NavItem[] = [
-  { to: '/personality', label: 'Overview', icon: Sparkles },
-  { to: '/personality', label: 'Dimensions', icon: Activity },
-  { to: '/personality', label: 'Do / Don\'t', icon: History }
+  { to: '/personality/overview', label: 'Overview', icon: Sparkles },
+  { to: '/personality/dimensions', label: 'Dimensions', icon: Activity },
+  { to: '/personality/do-dont', label: "Do / Don't", icon: History }
 ];
 
 const DIAGNOSTICS_NAV: NavItem[] = [
@@ -84,7 +79,11 @@ function AuthedLayout() {
   const hydrated = useProfile((s) => s.hydrated);
   const isAuthed = useProfile((s) => s.isAuthenticated);
   const router = useRouter();
-  const pathname = router.state.location.pathname;
+  // useLocation is the proper TanStack Router hook for the current
+  // pathname — it subscribes to updates so the per-page sidebar
+  // re-renders when the route changes. (router.state.location only
+  // captures the state at mount time inside a parent layout.)
+  const { pathname } = useLocation({ select: (l) => ({ pathname: l.pathname }) });
   const nav = useNavForCurrentPath(pathname);
 
   if (!hydrated) {

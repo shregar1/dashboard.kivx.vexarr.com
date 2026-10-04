@@ -1,23 +1,35 @@
-import { createRoute } from '@tanstack/react-router';
+import { createRoute, Outlet, redirect } from '@tanstack/react-router';
 
 import { Route as AuthedRoute } from '@/routes/_authed';
-import { PageHeader } from '@/components/layout/page';
-import { PersonalityPanel } from '@/features/personality-viewer/PersonalityPanel';
+import { PageContent } from '@/components/layout/page';
 
 export const Route = createRoute({
   getParentRoute: () => AuthedRoute,
   path: 'personality',
-  component: PersonalityPage
+  component: PersonalityLayout
 });
 
-function PersonalityPage() {
+/**
+ * Personality layout — child routes render into `<Outlet />`. The
+ * parent `AuthedRoute` provides the per-page sidebar nav with
+ * Overview / Dimensions / Do & Don't.
+ */
+function PersonalityLayout() {
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 p-6">
-      <PageHeader
-        title="Personality"
-        description="The user-style profile that gets injected into every LLM prompt. Built from your session feedback over time."
-      />
-      <PersonalityPanel />
-    </div>
+    <PageContent>
+      <Outlet />
+    </PageContent>
   );
 }
+
+/**
+ * `/personality` itself has no UI — redirect to the Overview page so
+ * clicking the sidebar item lands somewhere meaningful.
+ */
+export const IndexRoute = createRoute({
+  getParentRoute: () => Route,
+  path: '/',
+  beforeLoad: () => {
+    throw redirect({ to: '/personality/overview' });
+  }
+});
