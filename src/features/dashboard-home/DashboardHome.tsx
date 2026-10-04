@@ -104,10 +104,9 @@ export function DashboardHome() {
             <QuickLink to="/settings/audio" icon={<Mic className="size-3.5" />} label="Audio" />
             <QuickLink to="/settings/stt" icon={<AudioLines className="size-3.5" />} label="Speech-to-text" />
             <QuickLink to="/settings/hotkeys" icon={<Cpu className="size-3.5" />} label="Hotkeys" />
-            <QuickLink to="/settings/prompts" icon={<FileText className="size-3.5" />} label="Prompts" />
             <QuickLink to="/personality" icon={<Sparkles className="size-3.5" />} label="Personality" />
             <QuickLink to="/diagnostics" icon={<Activity className="size-3.5" />} label="Diagnostics" />
-            <QuickLink to="/diagnostics/bug-report" icon={<Bug className="size-3.5" />} label="Report a bug" />
+            <QuickLink to="/report/bug" icon={<Bug className="size-3.5" />} label="Report a bug" />
           </CardContent>
         </Card>
 
