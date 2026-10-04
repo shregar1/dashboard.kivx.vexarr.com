@@ -8,8 +8,7 @@ import {
   Mic,
   Activity,
   History,
-  Sparkles,
-  Bug
+  Sparkles
 } from 'lucide-react';
 
 import { Route as RootRoute } from '@/routes/__root';
@@ -40,9 +39,7 @@ const DIAGNOSTICS_NAV: NavItem[] = [
   { to: '/diagnostics', label: 'Status', icon: Activity }
 ];
 
-const SUPPORT_NAV: NavItem[] = [
-  { to: '/report/bug', label: 'Report a bug', icon: Bug, group: 'debug' }
-];
+// (Report a bug was moved to the profile menu — see profile-menu.tsx.)
 
 const HOME_NAV: NavItem[] = [
   { to: '/sessions', label: 'Sessions', icon: History },
@@ -51,21 +48,18 @@ const HOME_NAV: NavItem[] = [
 ];
 
 function useNavForCurrentPath(pathname: string): { title: string; items: NavItem[] } {
-  let nav: { title: string; items: NavItem[] };
   if (pathname.startsWith('/settings')) {
-    nav = { title: 'Settings', items: SETTINGS_NAV };
-  } else if (pathname.startsWith('/personality')) {
-    nav = { title: 'Personality', items: PERSONALITY_NAV };
-  } else if (pathname.startsWith('/diagnostics')) {
-    nav = { title: 'Diagnostics', items: DIAGNOSTICS_NAV };
-  } else {
-    // /sessions and the home dashboard share the global Workspace nav
-    // — sessions is its own destination, not a section with sub-pages.
-    nav = { title: 'Workspace', items: HOME_NAV };
+    return { title: 'Settings', items: SETTINGS_NAV };
   }
-  // The bug-report shortcut lives at the bottom of every page's
-  // sidebar in a dedicated "Support" group (rendered as `debug`).
-  return { ...nav, items: [...nav.items, ...SUPPORT_NAV] };
+  if (pathname.startsWith('/personality')) {
+    return { title: 'Personality', items: PERSONALITY_NAV };
+  }
+  if (pathname.startsWith('/diagnostics')) {
+    return { title: 'Diagnostics', items: DIAGNOSTICS_NAV };
+  }
+  // /sessions and the home dashboard share the global Workspace nav
+  // — sessions is its own destination, not a section with sub-pages.
+  return { title: 'Workspace', items: HOME_NAV };
 }
 
 export const Route = createRoute({
