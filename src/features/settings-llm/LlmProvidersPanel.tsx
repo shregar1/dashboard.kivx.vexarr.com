@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useRef, type ReactNode } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus,
@@ -8,7 +8,10 @@ import {
   Star,
   AlertCircle,
   RefreshCw,
-  Bot
+  Bot,
+  Pencil,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 import { Section, SectionRow, EmptyState } from '@/components/shared/section';
@@ -23,7 +26,6 @@ import { Confirm } from '@/components/ui/dialog';
 import { useConfig, useSetConfig, useProbe, useRunProbe, useReprobe } from '@/api/queries';
 import { providerEntrySchema, type ProviderEntry, type ProvidersMap } from '@/schemas/config';
 import { toast } from '@/stores/toast-store';
-import { formatRelativeTime } from '@/lib/utils';
 
 const BUILTIN_PROVIDERS: Array<{ id: string; label: string; baseURL?: string; builtin?: boolean }> = [
   { id: 'anthropic', label: 'Anthropic', baseURL: 'https://api.anthropic.com/v1', builtin: true },
@@ -42,6 +44,7 @@ export function LlmProvidersPanel() {
   const config = useConfig();
   const providers = (config.data?.providers ?? {}) as ProvidersMap;
   const activeProvider = config.data?.activeProvider;
+  const responseMode = config.data?.responseMode ?? 'auto';
 
   const customIds = Object.keys(providers).filter(
     (id) => !BUILTIN_PROVIDERS.some((b) => b.id === id)
@@ -54,8 +57,6 @@ export function LlmProvidersPanel() {
       return { id, label: e.label ?? id, baseURL: e.baseURL, builtin: e.builtin };
     })
   ];
-
-  const responseMode = config.data?.responseMode ?? 'auto';
 
   return (
     <div className="flex flex-col gap-6">
@@ -78,7 +79,7 @@ export function LlmProvidersPanel() {
 
       <Section
         title="Configured providers"
-        description="Each provider card stores its own API key, base URL, and model. The active provider is highlighted."
+        description="Each card stores its own API key, base URL, and model. The active provider is highlighted."
       >
         {allProviders.length === 0 ? (
           <EmptyState
@@ -87,7 +88,7 @@ export function LlmProvidersPanel() {
             description="Add one below or pick a built-in from the dropdown."
           />
         ) : (
-          <div className="grid grid-cols-1 gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 p-4 md:grid-cols-2 xl:grid-cols-3">
             {allProviders.map((p) => (
               <ProviderCard
                 key={p.id}
@@ -101,7 +102,7 @@ export function LlmProvidersPanel() {
           </div>
         )}
 
-        <div className="border-t border-border p-5">
+        <div className="border-t border-border p-4">
           <NewProviderInline />
         </div>
       </Section>
@@ -212,34 +213,31 @@ function ProviderCard({
 
   function makeActive() {
     setConfig.mutate({ activeProvider: id });
+    toast({ variant: 'info', title: `${label} set as active` });
   }
 
   function remove() {
     setConfirmDelete(false);
-    // We can't easily remove a single key with the desktop validator —
-    // it strips unknowns but doesn't take a "delete" sentinel. The desktop
-    // side handles `{providers: {[id]: undefined}}` specially: any key
-    // whose value is `undefined` is dropped from the providers map.
     setConfig.mutate({ providers: { [id]: undefined } as never });
     toast({ variant: 'info', title: `Removed ${label}` });
   }
 
   return (
     <>
-      <Card className={isActive ? 'border-primary/50 ring-1 ring-primary/30' : undefined}>
+      <Card className={isActive ? 'border-foreground' : undefined}>
         <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0">
           <div className="flex flex-col gap-1">
             <CardTitle className="flex items-center gap-2">
               {label}
               {isActive && (
-                <Badge variant="success" className="gap-1">
-                  <Star className="size-3" /> active
+                <Badge variant="default" className="gap-1">
+                  <Star className="size-3" /> Active
                 </Badge>
               )}
-              {builtin && <Badge variant="info">built-in</Badge>}
+              {builtin && <Badge variant="outline">built-in</Badge>}
             </CardTitle>
             <CardDescription>
-              <span className="font-mono text-xs">{id}</span>
+              <span className="font-mono text-[10px]">{id}</span>
             </CardDescription>
           </div>
           <ProbeBadge
@@ -252,20 +250,20 @@ function ProviderCard({
 
         <CardContent className="flex flex-col gap-3">
           {!open ? (
-            <div className="flex flex-wrap gap-2">
-              <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+            <div className="flex flex-wrap gap-1.5">
+              <Button size="sm" variant="outline" onClick={() => setOpen(true)} leftIcon={<Pencil className="size-3" />}>
                 Edit
               </Button>
               {!isActive && (
-                <Button size="sm" variant="secondary" onClick={makeActive}>
-                  Make active
+                <Button size="sm" variant="primary" onClick={makeActive}>
+                  Activate
                 </Button>
               )}
               {!builtin && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  leftIcon={<Trash2 className="size-3.5" />}
+                  leftIcon={<Trash2 className="size-3" />}
                   onClick={() => setConfirmDelete(true)}
                 >
                   Remove
@@ -281,9 +279,12 @@ function ProviderCard({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setDraft(entry)}
-                disabled={!isDirty}
+                rightIcon={<ChevronUp className="size-3" />}
+                onClick={() => setOpen(false)}
               >
+                Hide fields
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => setDraft(entry)} disabled={!isDirty}>
                 Discard
               </Button>
               <Button size="sm" onClick={save} disabled={!isDirty} loading={setConfig.isPending}>
@@ -315,7 +316,7 @@ function ProviderFormFields({
   onChange: (v: ProviderEntry) => void;
 }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2.5">
       <div>
         <Label htmlFor={`apiKey-${entry.id ?? ''}`}>API key</Label>
         <Input
@@ -378,7 +379,7 @@ function ProbeBadge({
     return (
       <Badge variant="info" className="gap-1">
         <Loader2 className="size-3 animate-spin" />
-        probing
+        Probing
       </Badge>
     );
   }
@@ -387,7 +388,7 @@ function ProbeBadge({
     | undefined;
   if (!s || s.status === 'idle' || s.status === 'cached') {
     return (
-      <Button size="sm" variant="ghost" onClick={onProbe} className="h-7 px-2 text-xs">
+      <Button size="sm" variant="ghost" onClick={onProbe}>
         Test
       </Button>
     );
@@ -397,11 +398,11 @@ function ProbeBadge({
       <button
         type="button"
         onClick={onReprobe}
-        title={`Last tested ${formatRelativeTime(s.probedAt)}`}
-        className="flex items-center gap-1 text-xs text-success transition-opacity hover:opacity-80"
+        title={`Last tested ${new Date(s.probedAt ?? 0).toLocaleString()}`}
+        className="inline-flex items-center gap-1 text-xs text-success transition-opacity hover:opacity-70"
       >
         <Check className="size-3" />
-        {s.latencyMs ? `${s.latencyMs}ms` : 'ok'}
+        {s.latencyMs ? `${s.latencyMs}ms` : 'OK'}
       </button>
     );
   }
@@ -410,10 +411,10 @@ function ProbeBadge({
       <button
         type="button"
         onClick={onReprobe}
-        className="flex items-center gap-1 text-xs text-destructive transition-opacity hover:opacity-80"
+        className="inline-flex items-center gap-1 text-xs text-destructive transition-opacity hover:opacity-70"
       >
         <AlertCircle className="size-3" />
-        {s.message ?? 'failed'}
+        {s.message ?? 'Failed'}
         <RefreshCw className="size-3" />
       </button>
     );
@@ -454,6 +455,7 @@ function NewProviderInline() {
       />
       <Button
         size="sm"
+        variant="primary"
         disabled={!value}
         leftIcon={<Plus className="size-3.5" />}
         onClick={add}
@@ -465,8 +467,6 @@ function NewProviderInline() {
   );
 }
 
-// keep imports referenced
 void useMemo;
-void useRef;
-void useQueryClient;
 void useMutation;
+void ChevronDown;

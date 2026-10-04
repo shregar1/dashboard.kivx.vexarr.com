@@ -1,7 +1,15 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link';
+export type ButtonVariant =
+  | 'primary' // black/white inverted
+  | 'accent' // sharp yellow — single high-emphasis affordance
+  | 'secondary' // bordered
+  | 'outline' // bordered
+  | 'ghost' // no chrome
+  | 'destructive' // red
+  | 'link';
+
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -14,22 +22,24 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/95 shadow-sm shadow-primary/20',
+    'bg-primary text-primary-foreground hover:opacity-90 active:opacity-100',
+  accent:
+    'bg-accent text-accent-foreground hover:opacity-90 active:opacity-100',
   secondary:
-    'bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border',
+    'bg-secondary text-secondary-foreground border border-border hover:bg-secondary/70',
   outline:
-    'border border-border bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground',
-  ghost: 'text-foreground hover:bg-accent hover:text-accent-foreground',
+    'border border-border bg-transparent text-foreground hover:bg-secondary',
+  ghost: 'text-foreground hover:bg-secondary',
   destructive:
-    'bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm shadow-destructive/20',
-  link: 'text-primary underline-offset-4 hover:underline'
+    'bg-destructive text-destructive-foreground hover:opacity-90',
+  link: 'text-foreground underline-offset-4 hover:underline p-0 h-auto'
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  sm: 'h-8 px-3 text-xs gap-1.5 rounded-md',
-  md: 'h-9 px-4 text-sm gap-2 rounded-md',
-  lg: 'h-11 px-6 text-sm gap-2 rounded-md',
-  icon: 'h-9 w-9 rounded-md'
+  sm: 'h-7 px-2.5 text-xs gap-1.5',
+  md: 'h-8 px-3 text-sm gap-1.5',
+  lg: 'h-10 px-4 text-sm gap-2',
+  icon: 'h-8 w-8'
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -40,9 +50,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     <button
       ref={ref}
       className={cn(
-        'inline-flex items-center justify-center font-medium transition-colors',
+        'inline-flex items-center justify-center font-medium transition-opacity',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        'disabled:pointer-events-none disabled:opacity-50',
+        'disabled:pointer-events-none disabled:opacity-40',
         variantClasses[variant],
         sizeClasses[size],
         className

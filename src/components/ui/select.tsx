@@ -7,21 +7,15 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   placeholder?: string;
 }
 
-export function Select({
-  className,
-  options,
-  placeholder,
-  children,
-  ...rest
-}: SelectProps) {
+export function Select({ className, options, placeholder, children, ...rest }: SelectProps) {
   return (
     <div className="relative">
       <select
         className={cn(
-          'flex h-9 w-full appearance-none rounded-md border border-input bg-background px-3 py-1 pr-8 text-sm shadow-sm',
+          'flex h-8 w-full appearance-none border border-input bg-background px-2.5 pr-7 text-sm',
           'transition-colors',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-          'disabled:cursor-not-allowed disabled:opacity-50',
+          'disabled:cursor-not-allowed disabled:opacity-40',
           className
         )}
         {...rest}
@@ -39,7 +33,7 @@ export function Select({
             ))
           : children}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <ChevronDown className="pointer-events-none absolute right-2 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
     </div>
   );
 }

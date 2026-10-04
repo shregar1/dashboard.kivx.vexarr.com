@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ReactNode, createContext, useContext } from 'react';
+import { useEffect, useRef, type ReactNode, createContext, useContext } from 'react';
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
 import { Button } from './button';
@@ -25,9 +25,11 @@ export interface DialogProps {
 }
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
+  // Children (DialogContent) mount only when open. Backdrop is also
+  // conditional — closed dialogs leave nothing in the DOM.
   return (
     <DialogContext.Provider value={{ open, setOpen: onOpenChange }}>
-      {children}
+      {open ? children : null}
       {open && <DialogBackdrop onDismiss={() => onOpenChange(false)} />}
     </DialogContext.Provider>
   );
@@ -36,7 +38,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
 function DialogBackdrop({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div
-      className="fixed inset-0 z-50 bg-background/70 animate-fade-in"
+      className="fixed inset-0 z-50 bg-foreground/40 animate-fade-in"
       onClick={onDismiss}
       aria-hidden
     />
@@ -54,17 +56,17 @@ export function DialogContent({
 }) {
   const ctx = useDialog();
   const ref = useRef<HTMLDivElement>(null);
+  const isOpen = ctx.open;
 
   useEffect(() => {
+    if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') ctx.setOpen(false);
     };
-    if (ctx.open) {
-      document.addEventListener('keydown', onKey);
-      ref.current?.focus();
-    }
+    document.addEventListener('keydown', onKey);
+    ref.current?.focus();
     return () => document.removeEventListener('keydown', onKey);
-  }, [ctx]);
+  }, [isOpen, ctx.setOpen]);
 
   const sizeClass = {
     sm: 'max-w-sm',
@@ -79,8 +81,7 @@ export function DialogContent({
         ref={ref}
         tabIndex={-1}
         className={cn(
-          'relative w-full rounded-lg border border-border bg-card text-card-foreground shadow-2xl shadow-black/30',
-          'animate-slide-up focus:outline-none',
+          'relative w-full border border-border bg-card text-card-foreground animate-slide-up focus:outline-none',
           sizeClass,
           className
         )}
@@ -93,7 +94,7 @@ export function DialogContent({
 
 export function DialogHeader({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('flex items-start justify-between gap-4 p-5 pb-3', className)}>
+    <div className={cn('flex items-start justify-between gap-4 border-b border-border p-4', className)}>
       <div className="flex-1">{children}</div>
       <DialogCloseButton />
     </div>
@@ -107,7 +108,7 @@ export function DialogCloseButton() {
       type="button"
       aria-label="Close"
       onClick={() => ctx.setOpen(false)}
-      className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+      className="text-muted-foreground transition-colors hover:text-foreground"
     >
       <X className="size-4" />
     </button>
@@ -115,7 +116,7 @@ export function DialogCloseButton() {
 }
 
 export function DialogTitle({ children, className }: { children: ReactNode; className?: string }) {
-  return <h2 className={cn('text-base font-semibold', className)}>{children}</h2>;
+  return <h2 className={cn('text-base font-semibold tracking-tight', className)}>{children}</h2>;
 }
 
 export function DialogDescription({ children, className }: { children: ReactNode; className?: string }) {
@@ -123,12 +124,14 @@ export function DialogDescription({ children, className }: { children: ReactNode
 }
 
 export function DialogBody({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn('px-5 py-2', className)}>{children}</div>;
+  return <div className={cn('p-4', className)}>{children}</div>;
 }
 
 export function DialogFooter({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('flex items-center justify-end gap-2 p-5 pt-3', className)}>{children}</div>
+    <div className={cn('flex items-center justify-end gap-2 border-t border-border p-4', className)}>
+      {children}
+    </div>
   );
 }
 
@@ -195,7 +198,7 @@ export function Sheet({ open, onOpenChange, children }: SheetProps) {
     <DialogContext.Provider value={{ open, setOpen: onOpenChange }}>
       <div className="fixed inset-0 z-50 flex justify-end">
         <DialogBackdrop onDismiss={() => onOpenChange(false)} />
-        <div className="relative h-full w-full max-w-xl overflow-y-auto border-l border-border bg-card text-card-foreground shadow-2xl animate-slide-up">
+        <div className="relative h-full w-full max-w-xl overflow-y-auto border-l border-border bg-card text-card-foreground animate-slide-up">
           {children}
         </div>
       </div>
@@ -213,15 +216,9 @@ export function SheetClose({ onClose }: { onClose?: () => void }) {
         ctx.setOpen(false);
         onClose?.();
       }}
-      className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+      className="text-muted-foreground transition-colors hover:text-foreground"
     >
       <X className="size-4" />
     </button>
   );
 }
-
-// Stub to silence the unused import lint while keeping the helper set in
-// one module. The actual `useState`/`useEffect` exports from react are
-// used by the primitives above.
-void useState;
-void useEffect;

@@ -15,13 +15,13 @@ export function PageHeader({
   className?: string;
 }) {
   return (
-    <div className={cn('flex flex-col gap-2 pb-6', className)}>
+    <div className={cn('flex flex-col gap-2 border-b border-border pb-6', className)}>
       {breadcrumbs}
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
           {description && (
-            <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{description}</p>
+            <p className="mt-1.5 max-w-3xl text-sm text-muted-foreground">{description}</p>
           )}
         </div>
         {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}

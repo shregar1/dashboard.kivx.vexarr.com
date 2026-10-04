@@ -6,16 +6,13 @@ import {
   Download,
   Tag,
   ChevronRight,
-  FileJson,
-  Bot,
-  History as HistoryIcon,
-  AlertTriangle
+  AlertTriangle,
+  History as HistoryIcon
 } from 'lucide-react';
 
 import { Section, EmptyState } from '@/components/shared/section';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Confirm } from '@/components/ui/dialog';
 
@@ -85,16 +82,16 @@ export function SessionsBrowserPanel() {
         title="Sessions"
         description="Every interview KivX has recorded. Click a row to inspect the full transcript, then export or delete."
       >
-        <div className="flex items-center gap-2 border-b border-border p-4">
+        <div className="flex items-center gap-2 border-b border-border p-3">
           <Search className="size-4 text-muted-foreground" />
           <Input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by summary, JD snippet, or tags…"
-            className="flex-1"
+            className="flex-1 border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
-          <span className="text-xs text-muted-foreground">
-            {filtered.length} of {list.length}
+          <span className="font-mono text-xs text-muted-foreground">
+            {filtered.length} / {list.length}
           </span>
         </div>
 
@@ -102,10 +99,14 @@ export function SessionsBrowserPanel() {
           <EmptyState
             icon={<HistoryIcon className="size-6" />}
             title={list.length === 0 ? 'No sessions yet' : 'No matches'}
-            description={list.length === 0 ? 'Start a session in the overlay to record your first one.' : 'Try a different search term.'}
+            description={
+              list.length === 0
+                ? 'Start a session in the overlay to record your first one.'
+                : 'Try a different search term.'
+            }
           />
         ) : (
-          <ul className="divide-y divide-border">
+          <ul>
             {filtered.map((s) => (
               <SessionRow
                 key={s.urn}
@@ -122,16 +123,18 @@ export function SessionsBrowserPanel() {
 
       {q.trim().length > 0 && search.data && search.data.length > 0 && (
         <Section title="Semantic matches" description="Embedding-based search across session transcripts.">
-          <ul className="divide-y divide-border">
+          <ul>
             {search.data.map((hit) => (
-              <li key={hit.sessionId} className="flex items-center justify-between gap-4 p-3">
+              <li key={hit.sessionId} className="flex items-center justify-between gap-4 border-b border-border p-3 last:border-b-0">
                 <div className="min-w-0">
-                  <div className="truncate text-sm font-medium">{truncate(hit.jdSnippet, 80) || 'No JD'}</div>
+                  <div className="truncate text-sm font-medium">
+                    {truncate(hit.jdSnippet, 80) || 'No JD'}
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     score {hit.score.toFixed(2)} · {hit.turnCount} turns · {formatRelativeTime(hit.startedAt)}
                   </div>
                 </div>
-                <Badge variant="info">{hit.topicTags.slice(0, 3).join(', ') || 'general'}</Badge>
+                <Badge variant="outline">{hit.topicTags.slice(0, 3).join(', ') || 'general'}</Badge>
               </li>
             ))}
           </ul>
@@ -143,15 +146,18 @@ export function SessionsBrowserPanel() {
           title="Orphans"
           description="Sessions with turns but no endedAt — usually force-quit recovery. Finalize to attach a summary."
         >
-          <ul className="divide-y divide-border">
+          <ul>
             {(orphans.data ?? []).map((o) => (
-              <li key={o.sessionUrn} className="flex items-center justify-between gap-4 p-3">
+              <li
+                key={o.sessionUrn}
+                className="flex items-center justify-between gap-4 border-b border-border p-3 last:border-b-0"
+              >
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="size-4 text-warning" />
                   <span className="text-sm font-medium">{truncate(o.jdSnippet, 60) || 'No JD'}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">{o.turnCount} turns</span>
+                  <span className="font-mono text-xs text-muted-foreground">{o.turnCount} turns</span>
                   <Button
                     size="sm"
                     variant="outline"
@@ -199,25 +205,23 @@ function SessionRow({
   exporting: boolean;
 }) {
   return (
-    <li className="group flex items-center justify-between gap-3 p-3 transition-colors hover:bg-accent/40">
-      <Link
-        to="/sessions/$urn"
-        params={{ urn: session.urn }}
-        className="flex flex-1 items-center gap-3 min-w-0"
-      >
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
-          {session.dominantProviderLabel ? <Bot className="size-4" /> : <HistoryIcon className="size-4" />}
+    <li className="group flex items-center justify-between gap-3 border-b border-border transition-colors last:border-b-0 hover:bg-secondary">
+      <Link to="/sessions/$urn" params={{ urn: session.urn }} className="flex flex-1 items-center gap-3 px-3 py-2.5 min-w-0">
+        <div className="flex size-7 shrink-0 items-center justify-center border border-border text-muted-foreground">
+          <HistoryIcon className="size-3.5" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate text-sm font-medium">
-              {truncate(session.summary, 80) || truncate(session.jdSnippet, 80) || `Session ${session.id.slice(0, 8)}`}
+              {truncate(session.summary, 80) ||
+                truncate(session.jdSnippet, 80) ||
+                `Session ${session.id.slice(0, 8)}`}
             </span>
             {session.dominantProviderLabel && (
-              <Badge variant="info">{session.dominantProviderLabel}</Badge>
+              <Badge variant="outline">{session.dominantProviderLabel}</Badge>
             )}
           </div>
-          <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="mt-0.5 flex items-center gap-2 font-mono text-xs text-muted-foreground">
             <span>{formatRelativeTime(session.startedAt)}</span>
             <span>·</span>
             <span>{session.turnCount} turns</span>
@@ -231,14 +235,8 @@ function SessionRow({
           </div>
         </div>
       </Link>
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Export"
-          onClick={onExport}
-          loading={exporting}
-        >
+      <div className="flex items-center gap-0.5 pr-1">
+        <Button variant="ghost" size="icon" aria-label="Export" onClick={onExport} loading={exporting}>
           <Download className="size-3.5" />
         </Button>
         <Button variant="ghost" size="icon" aria-label="Delete" onClick={onDelete} loading={deleting}>
@@ -248,7 +246,7 @@ function SessionRow({
           to="/sessions/$urn"
           params={{ urn: session.urn }}
           aria-label="Open"
-          className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+          className="inline-flex h-8 w-8 items-center justify-center text-muted-foreground hover:bg-background hover:text-foreground"
         >
           <ChevronRight className="size-4" />
         </Link>
@@ -256,10 +254,3 @@ function SessionRow({
     </li>
   );
 }
-
-// keep imports referenced
-void FileJson;
-void Card;
-void CardHeader;
-void CardTitle;
-void CardContent;

@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { CircleDot, Moon, Sun, MonitorSmartphone, RefreshCw, ExternalLink } from 'lucide-react';
+import { Moon, Sun, MonitorSmartphone, RefreshCw, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useUi, type Theme } from '@/stores/ui-store';
 import { ipc } from '@/lib/ipc';
 import { cn } from '@/lib/utils';
-import { queryKeys } from '@/lib/query-client';
 
 export function Topbar() {
   const theme = useUi((s) => s.theme);
@@ -33,15 +32,15 @@ export function Topbar() {
   }, []);
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-5">
-      <div className="flex items-center gap-4">
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-5">
+      <div className="flex items-center gap-3">
         <ConnectionPill connected={connected} />
-        <Badge variant="info" className="font-mono">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           v0.1.0
-        </Badge>
+        </span>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <Button
           variant="ghost"
           size="icon"
@@ -71,13 +70,12 @@ export function Topbar() {
 }
 
 function ConnectionPill({ connected }: { connected: boolean | null }) {
-  const label =
-    connected === null ? 'Connecting…' : connected ? 'Connected' : 'Offline';
+  const label = connected === null ? 'Connecting' : connected ? 'Connected' : 'Offline';
   return (
     <div className="flex items-center gap-2 text-xs">
       <span
         className={cn(
-          'inline-block size-2 rounded-full',
+          'inline-block size-1.5 rounded-full',
           connected === null
             ? 'bg-muted-foreground animate-pulse'
             : connected
@@ -85,22 +83,16 @@ function ConnectionPill({ connected }: { connected: boolean | null }) {
               : 'bg-destructive'
         )}
       />
-      <span className="font-medium text-foreground/80">{label}</span>
+      <span className="font-medium">{label}</span>
       <span className="text-muted-foreground">to KivX host</span>
     </div>
   );
 }
 
-function ThemeToggle({
-  theme,
-  onTheme
-}: {
-  theme: Theme;
-  onTheme: (t: Theme) => void;
-}) {
+function ThemeToggle({ theme, onTheme }: { theme: Theme; onTheme: (t: Theme) => void }) {
   return (
-    <div className="inline-flex h-9 items-center rounded-md border border-border bg-background p-0.5">
-      {(['dark', 'light', 'system'] as const).map((t) => {
+    <div className="inline-flex h-8 items-center border border-border">
+      {(['dark', 'light', 'system'] as const).map((t, i) => {
         const Icon = t === 'dark' ? Moon : t === 'light' ? Sun : MonitorSmartphone;
         const active = theme === t;
         return (
@@ -110,10 +102,9 @@ function ThemeToggle({
             aria-label={`Theme: ${t}`}
             onClick={() => onTheme(t)}
             className={cn(
-              'inline-flex h-7 w-7 items-center justify-center rounded transition-colors',
-              active
-                ? 'bg-accent text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
+              'inline-flex h-full w-7 items-center justify-center transition-colors',
+              i > 0 && 'border-l border-border',
+              active ? 'bg-foreground text-background' : 'text-muted-foreground hover:text-foreground'
             )}
           >
             <Icon className="size-3.5" />
@@ -124,5 +115,5 @@ function ThemeToggle({
   );
 }
 
-// Re-export the underlying hook so callers don't need to dig into lib.
-export { queryKeys, CircleDot };
+// keep references
+void Badge;

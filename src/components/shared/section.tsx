@@ -38,7 +38,7 @@ export function Field({
   );
 }
 
-/** Two-column "section" — header (title + description) + body. */
+/** Section card with title + body rows. Flat B/W with hairline borders. */
 export function Section({
   title,
   description,
@@ -53,11 +53,11 @@ export function Section({
   footer?: ReactNode;
 }) {
   return (
-    <div className={cn('rounded-lg border border-border bg-card text-card-foreground shadow-sm', className)}>
+    <div className={cn('border border-border bg-card text-card-foreground', className)}>
       {(title || description) && (
-        <div className="border-b border-border p-5">
-          {title && <h2 className="text-base font-semibold">{title}</h2>}
-          {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
+        <div className="border-b border-border p-4">
+          {title && <h2 className="text-sm font-semibold tracking-tight">{title}</h2>}
+          {description && <p className="mt-1 text-xs text-muted-foreground">{description}</p>}
         </div>
       )}
       <div className="divide-y divide-border">{children}</div>
@@ -85,7 +85,7 @@ export function SectionRow({
   return (
     <div
       className={cn(
-        'px-5 py-4',
+        'px-4 py-3',
         horizontal ? 'flex items-center justify-between gap-6' : 'flex flex-col gap-3'
       )}
     >
@@ -112,10 +112,10 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border p-12 text-center">
+    <div className="flex flex-col items-center justify-center gap-3 border border-dashed border-border p-12 text-center">
       {icon && <div className="text-muted-foreground">{icon}</div>}
       <div>
-        <h3 className="text-sm font-medium">{title}</h3>
+        <h3 className="text-sm font-semibold">{title}</h3>
         {description && <p className="mt-1 text-xs text-muted-foreground">{description}</p>}
       </div>
       {action}

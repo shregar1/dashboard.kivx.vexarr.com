@@ -11,9 +11,9 @@ const iconMap = {
 
 const variantClasses = {
   info: 'border-border bg-card text-foreground',
-  success: 'border-success/40 bg-success/10 text-success',
-  warning: 'border-warning/40 bg-warning/10 text-warning',
-  error: 'border-destructive/40 bg-destructive/10 text-destructive'
+  success: 'border-success bg-success text-success-foreground',
+  warning: 'border-warning bg-warning text-warning-foreground',
+  error: 'border-destructive bg-destructive text-destructive-foreground'
 } as const;
 
 export function Toaster() {
@@ -29,22 +29,22 @@ export function Toaster() {
             key={t.id}
             role="status"
             className={cn(
-              'pointer-events-auto flex w-[360px] animate-slide-up items-start gap-3 rounded-lg border px-4 py-3 shadow-lg shadow-black/30',
+              'pointer-events-auto flex w-[360px] animate-slide-up items-start gap-3 border px-4 py-3',
               variantClasses[t.variant]
             )}
           >
             <Icon className="size-4 shrink-0 mt-0.5" />
             <div className="flex-1">
-              <div className="text-sm font-medium">{t.title}</div>
+              <div className="text-sm font-semibold">{t.title}</div>
               {t.description && (
-                <div className="mt-1 text-xs text-muted-foreground">{t.description}</div>
+                <div className="mt-0.5 text-xs opacity-80">{t.description}</div>
               )}
             </div>
             <button
               type="button"
               aria-label="Dismiss"
               onClick={() => dismiss(t.id)}
-              className="rounded p-0.5 text-current opacity-60 transition-opacity hover:opacity-100"
+              className="opacity-70 transition-opacity hover:opacity-100"
             >
               <X className="size-3.5" />
             </button>

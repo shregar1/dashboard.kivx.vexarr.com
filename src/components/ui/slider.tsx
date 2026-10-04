@@ -24,10 +24,10 @@ export function Slider({
 
   return (
     <div className="flex items-center gap-3">
-      <div className="relative h-5 flex-1">
-        <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-muted" />
+      <div className="relative h-4 flex-1">
+        <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-border" />
         <div
-          className="absolute left-0 top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-primary"
+          className="absolute left-0 top-1/2 h-px -translate-y-1/2 bg-foreground"
           style={{ width: `${pct}%` }}
         />
         <input
@@ -39,8 +39,8 @@ export function Slider({
           onChange={(e) => onValueChange(Number(e.target.value))}
           className={cn(
             'absolute inset-0 h-full w-full cursor-pointer appearance-none bg-transparent',
-            '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110',
-            '[&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-primary [&::-moz-range-thumb]:border-0',
+            '[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:rounded-none [&::-webkit-slider-thumb]:bg-foreground [&::-webkit-slider-thumb]:border [&::-webkit-slider-thumb]:border-foreground [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110',
+            '[&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:size-3 [&::-moz-range-thumb]:rounded-none [&::-moz-range-thumb]:bg-foreground [&::-moz-range-thumb]:border-foreground',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             className
           )}

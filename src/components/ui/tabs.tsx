@@ -34,10 +34,7 @@ export function TabsList({ children, className, ...rest }: HTMLAttributes<HTMLDi
   return (
     <div
       role="tablist"
-      className={cn(
-        'inline-flex h-9 items-center justify-start rounded-md bg-muted p-1 text-muted-foreground',
-        className
-      )}
+      className={cn('inline-flex h-8 items-center border border-border', className)}
       {...rest}
     >
       {children}
@@ -63,12 +60,11 @@ export function TabsTrigger({
       aria-selected={active}
       onClick={() => ctx.setValue(value)}
       className={cn(
-        'inline-flex items-center justify-center whitespace-nowrap rounded px-3 py-1 text-xs font-medium ring-offset-background transition-all',
+        'inline-flex h-full items-center justify-center px-3 text-xs font-medium uppercase tracking-wider transition-colors',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         active
-          ? 'bg-background text-foreground shadow'
-          : 'text-muted-foreground hover:text-foreground',
-        className
+          ? 'bg-foreground text-background'
+          : 'text-muted-foreground hover:text-foreground'
       )}
     >
       {children}

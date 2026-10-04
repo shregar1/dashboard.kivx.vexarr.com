@@ -9,6 +9,9 @@ export default {
         sans: ['Geist', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace']
       },
+      // Flat B/W palette. Single accent (`accent` = yellow) for the
+      // one thing on screen that should pull attention. Status colors
+      // stay semantic (success/warning/destructive) but stay flat.
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -58,10 +61,18 @@ export default {
           border: 'hsl(var(--sidebar-border))'
         }
       },
+      // Sharper corners. No more pill-shaped modals.
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)'
+        none: '0',
+        DEFAULT: '4px',
+        sm: '2px',
+        md: '4px',
+        lg: '6px',
+        full: '9999px'
+      },
+      // No drop shadows anywhere — flat design.
+      boxShadow: {
+        none: 'none'
       },
       keyframes: {
         'fade-in': {
@@ -74,8 +85,8 @@ export default {
         }
       },
       animation: {
-        'fade-in': 'fade-in 160ms ease-out',
-        'slide-up': 'slide-up 200ms ease-out'
+        'fade-in': 'fade-in 120ms ease-out',
+        'slide-up': 'slide-up 160ms ease-out'
       }
     }
   },

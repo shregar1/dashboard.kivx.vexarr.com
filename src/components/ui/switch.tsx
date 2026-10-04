@@ -19,9 +19,9 @@ export function Switch({
   size = 'md',
   ...rest
 }: SwitchProps) {
-  const trackSize = size === 'sm' ? 'h-4 w-7' : 'h-5 w-9';
-  const thumbSize = size === 'sm' ? 'h-3 w-3' : 'h-4 w-4';
-  const thumbOffset = size === 'sm' ? (checked ? 'translate-x-3' : 'translate-x-0.5') : (checked ? 'translate-x-4' : 'translate-x-0.5');
+  const trackSize = size === 'sm' ? 'h-3.5 w-6' : 'h-4 w-8';
+  const thumbSize = size === 'sm' ? 'h-2.5 w-2.5' : 'h-3 w-3';
+  const thumbOffset = size === 'sm' ? (checked ? 'translate-x-2.5' : 'translate-x-0.5') : (checked ? 'translate-x-4' : 'translate-x-0.5');
 
   return (
     <label
@@ -38,16 +38,17 @@ export function Switch({
         disabled={disabled}
         onClick={() => onCheckedChange(!checked)}
         className={cn(
-          'relative inline-flex shrink-0 items-center rounded-full border-2 border-transparent transition-colors',
+          'relative inline-flex shrink-0 items-center border border-foreground/30 transition-colors',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           trackSize,
-          checked ? 'bg-primary' : 'bg-muted'
+          checked ? 'bg-foreground' : 'bg-secondary'
         )}
         {...rest}
       >
         <span
           className={cn(
-            'pointer-events-none inline-block transform rounded-full bg-background shadow ring-0 transition-transform',
+            'pointer-events-none inline-block transform bg-foreground shadow-none ring-0 transition-transform',
+            checked && 'bg-background',
             thumbSize,
             thumbOffset
           )}
