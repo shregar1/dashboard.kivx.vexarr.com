@@ -1,9 +1,9 @@
 import { createRoute, Outlet } from '@tanstack/react-router';
 
-import { Route as RootRoute } from '@/routes/__root';
+import { Route as AuthedRoute } from '@/routes/_authed';
 
 export const Route = createRoute({
-  getParentRoute: () => RootRoute,
+  getParentRoute: () => AuthedRoute,
   path: 'sessions',
   component: SessionsLayout
 });

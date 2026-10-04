@@ -10,7 +10,7 @@ import { Confirm } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 
-import { Route as SessionsRoute } from '@/routes/sessions/route';
+import { Route as AuthedRoute } from '@/routes/_authed';
 
 import {
   useSession,
@@ -28,8 +28,8 @@ import { formatDateTime, formatRelativeTime, truncate } from '@/lib/utils';
 import { sessionFeedbackSchema } from '@/schemas/session';
 
 export const Route = createRoute({
-  getParentRoute: () => SessionsRoute,
-  path: '$urn',
+  getParentRoute: () => AuthedRoute,
+  path: 'sessions/$urn',
   component: SessionDetailPage
 });
 

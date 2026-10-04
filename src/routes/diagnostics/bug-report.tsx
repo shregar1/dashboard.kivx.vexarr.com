@@ -1,11 +1,11 @@
 import { createRoute } from '@tanstack/react-router';
 
-import { Route as RootRoute } from '@/routes/__root';
+import { Route as AuthedRoute } from '@/routes/_authed';
 import { PageHeader } from '@/components/layout/page';
 import { BugReportPanel } from '@/features/diagnostics-panel/BugReportPanel';
 
 export const Route = createRoute({
-  getParentRoute: () => RootRoute,
+  getParentRoute: () => AuthedRoute,
   path: 'diagnostics/bug-report',
   component: BugReportPage
 });

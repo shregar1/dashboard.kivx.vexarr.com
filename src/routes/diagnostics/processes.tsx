@@ -1,13 +1,13 @@
 import { createRoute } from '@tanstack/react-router';
 import { Cpu } from 'lucide-react';
 
-import { Route as RootRoute } from '@/routes/__root';
+import { Route as AuthedRoute } from '@/routes/_authed';
 import { PageHeader } from '@/components/layout/page';
 import { Section, SectionRow, EmptyState } from '@/components/shared/section';
 import { Badge } from '@/components/ui/badge';
 
 export const Route = createRoute({
-  getParentRoute: () => RootRoute,
+  getParentRoute: () => AuthedRoute,
   path: 'diagnostics/processes',
   component: ProcessesPage
 });
