@@ -8,8 +8,7 @@ import {
   ChevronRight,
   AlertTriangle,
   History as HistoryIcon,
-  Plus,
-  Loader2
+  Plus
 } from 'lucide-react';
 
 import { Section, EmptyState } from '@/components/shared/section';
@@ -26,10 +25,11 @@ import {
   useOrphanSessions,
   useFinalizeOrphan
 } from '@/api/queries';
-import { ipc } from '@/lib/ipc';
 import type { SessionListEntryDto } from '@/schemas/session';
 import { toast } from '@/stores/toast-store';
 import { formatRelativeTime, truncate } from '@/lib/utils';
+
+import { SessionWizard } from './SessionWizard';
 
 export function SessionsBrowserPanel() {
   const sessions = useSessions();
@@ -41,23 +41,7 @@ export function SessionsBrowserPanel() {
 
   const [q, setQ] = useState('');
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [creating, setCreating] = useState(false);
-
-  async function handleCreate() {
-    if (creating) return;
-    setCreating(true);
-    try {
-      await ipc.startSession();
-      toast({ variant: 'success', title: 'Session starting', description: 'The overlay should appear shortly.' });
-      // Refresh the list so a fresh session shows up in the browser
-      // (the desktop host writes the record asynchronously).
-      await sessions.refetch();
-    } catch (e) {
-      toast({ variant: 'error', title: 'Could not start session', description: String(e) });
-    } finally {
-      setCreating(false);
-    }
-  }
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const list = sessions.data ?? [];
   const search = useSearchSessions(q);
@@ -105,9 +89,8 @@ export function SessionsBrowserPanel() {
           <Button
             variant="primary"
             size="sm"
-            leftIcon={creating ? <Loader2 className="size-3 animate-spin" /> : <Plus className="size-3" />}
-            onClick={handleCreate}
-            loading={creating}
+            leftIcon={<Plus className="size-3" />}
+            onClick={() => setWizardOpen(true)}
           >
             Create session
           </Button>
@@ -218,6 +201,8 @@ export function SessionsBrowserPanel() {
         variant="destructive"
         onConfirm={() => confirmDelete && handleDelete(confirmDelete)}
       />
+
+      <SessionWizard open={wizardOpen} onOpenChange={setWizardOpen} />
     </div>
   );
 }
