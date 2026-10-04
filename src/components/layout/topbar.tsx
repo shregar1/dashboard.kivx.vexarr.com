@@ -53,17 +53,6 @@ export function Topbar() {
         </Button>
 
         <ThemeToggle theme={theme} onTheme={setTheme} />
-
-        <Button
-          variant="outline"
-          size="sm"
-          leftIcon={<ExternalLink className="size-3.5" />}
-          onClick={() => {
-            void ipc.openExternal('https://kivx.ai/docs');
-          }}
-        >
-          Docs
-        </Button>
       </div>
     </header>
   );
