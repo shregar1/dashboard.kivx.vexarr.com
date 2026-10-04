@@ -18,11 +18,7 @@ import { Route as SettingsDataRoute } from '@/routes/settings/data';
 import { Route as SessionsRoute } from '@/routes/sessions/route';
 import { Route as SessionsIndexRoute } from '@/routes/sessions/index';
 import { Route as SessionDetailRoute } from '@/routes/sessions/$urn';
-import { Route as PersonalityRoute } from '@/routes/personality/route';
-import { Route as PersonalityIndexRoute } from '@/routes/personality/index';
-import { Route as PersonalityOverviewRoute } from '@/routes/personality/overview';
-import { Route as PersonalityDimensionsRoute } from '@/routes/personality/dimensions';
-import { Route as PersonalityRulesRoute } from '@/routes/personality/do-dont';
+import { Route as PersonalityRoute } from '@/routes/personality';
 import { Route as DiagnosticsRoute } from '@/routes/diagnostics/index';
 import { Route as BugReportRoute } from '@/routes/report/bug';
 
@@ -39,12 +35,7 @@ const routeTree = RootRoute.addChildren([
       SettingsDataRoute
     ]),
     SessionsRoute.addChildren([SessionsIndexRoute, SessionDetailRoute]),
-    PersonalityRoute.addChildren([
-      PersonalityIndexRoute,
-      PersonalityOverviewRoute,
-      PersonalityDimensionsRoute,
-      PersonalityRulesRoute
-    ]),
+    PersonalityRoute,
     DiagnosticsRoute.addChildren([]),
     BugReportRoute
   ])

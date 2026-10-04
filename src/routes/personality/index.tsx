@@ -1,15 +1,25 @@
-import { createRoute, redirect } from '@tanstack/react-router';
+import { createRoute, Outlet } from '@tanstack/react-router';
 
-import { Route as PersonalityRoute } from '@/routes/personality/route';
+import { Route as AuthedRoute } from '@/routes/_authed';
+import { PageContent } from '@/components/layout/page';
+import { PersonalityPanel } from '@/features/personality-viewer/PersonalityPanel';
+
+export const Route = createRoute({
+  getParentRoute: () => AuthedRoute,
+  path: 'personality',
+  component: PersonalityLayout
+});
 
 /**
- * `/personality` itself has no UI — redirect to the Overview page so
- * clicking the sidebar item lands somewhere meaningful.
+ * Personality layout — the panel uses internal tabs (Overview /
+ * Dimensions / Do & Don't), so the layout is a single content
+ * frame. The `_authed` parent provides the per-page sidebar nav.
  */
-export const Route = createRoute({
-  getParentRoute: () => PersonalityRoute,
-  path: '/',
-  beforeLoad: () => {
-    throw redirect({ to: '/personality/overview' });
-  }
-});
+function PersonalityLayout() {
+  return (
+    <PageContent>
+      <PersonalityPanel />
+      <Outlet />
+    </PageContent>
+  );
+}

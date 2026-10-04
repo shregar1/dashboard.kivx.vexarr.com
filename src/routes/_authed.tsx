@@ -29,10 +29,11 @@ const SETTINGS_NAV: NavItem[] = [
 // doesn't need its own per-page sidebar. The search / orphans /
 // export affordances all live inside the page itself.
 
+// Personality is a single page with internal tabs — no per-page sub-nav
+// needed. The Overview / Dimensions / Do & Don't sections live inside
+// the page itself.
 const PERSONALITY_NAV: NavItem[] = [
-  { to: '/personality/overview', label: 'Overview', icon: Sparkles },
-  { to: '/personality/dimensions', label: 'Dimensions', icon: Activity },
-  { to: '/personality/do-dont', label: "Do / Don't", icon: History }
+  { to: '/personality', label: 'Personality', icon: Sparkles }
 ];
 
 const DIAGNOSTICS_NAV: NavItem[] = [
