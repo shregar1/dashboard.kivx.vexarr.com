@@ -198,7 +198,7 @@ function DoDontTab() {
   const antiPatterns = data?.antiPatterns ?? [];
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div className="flex flex-col gap-4">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b border-border p-4">
           <div>
