@@ -12,6 +12,8 @@ import {
 import { cn } from '@/lib/utils';
 import { useUi } from '@/stores/ui-store';
 
+import { ProfileMenu } from './profile-menu';
+
 interface NavItem {
   to: string;
   label: string;
@@ -94,18 +96,22 @@ export function Sidebar() {
         )}
       </nav>
 
-      <div className="border-t border-sidebar-border p-2">
-        <button
-          type="button"
-          onClick={toggle}
-          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          className="flex h-7 w-full items-center gap-2 px-2 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-        >
-          <ChevronLeft
-            className={cn('size-3.5 shrink-0 transition-transform', collapsed && 'rotate-180')}
-          />
-          {!collapsed && <span>Collapse</span>}
-        </button>
+      <div className="mt-auto">
+        <ProfileMenu />
+
+        <div className="border-t border-sidebar-border p-2">
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className="flex h-7 w-full items-center gap-2 px-2 text-xs text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+          >
+            <ChevronLeft
+              className={cn('size-3.5 shrink-0 transition-transform', collapsed && 'rotate-180')}
+            />
+            {!collapsed && <span>Collapse</span>}
+          </button>
+        </div>
       </div>
     </aside>
   );
