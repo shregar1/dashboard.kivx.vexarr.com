@@ -113,7 +113,7 @@ export function SessionWizard({ open, onOpenChange }: SessionWizardProps) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => (v ? onOpenChange(true) : close())}>
-      <DialogContent size="lg">
+      <DialogContent size="xl">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="flex size-9 items-center justify-center border border-border">
@@ -165,8 +165,8 @@ export function SessionWizard({ open, onOpenChange }: SessionWizardProps) {
             value={value}
             onChange={(e) => setValueFor(step.id, e.target.value)}
             placeholder={step.placeholder}
-            rows={10}
-            className="font-mono text-xs"
+            rows={16}
+            className="min-h-[280px] font-mono text-xs"
             autoFocus
           />
           <div className="mt-1 flex items-center justify-between font-mono text-[10px] text-muted-foreground">

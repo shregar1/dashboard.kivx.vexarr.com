@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode, createContext, useContext } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
 import { Button } from './button';
@@ -26,11 +27,20 @@ export interface DialogProps {
 
 export function Dialog({ open, onOpenChange, children }: DialogProps) {
   // Children (DialogContent) mount only when open. Backdrop is also
-  // conditional — closed dialogs leave nothing in the DOM.
+  // conditional — closed dialogs leave nothing in the DOM. The portal
+  // hoists the modal out of any stacking-context trap (the Shell uses
+  // `overflow-hidden` which creates a new context, so a non-portaled
+  // fixed-position dialog can be silently clipped or non-clickable).
   return (
     <DialogContext.Provider value={{ open, setOpen: onOpenChange }}>
-      {open ? children : null}
-      {open && <DialogBackdrop onDismiss={() => onOpenChange(false)} />}
+      {open &&
+        createPortal(
+          <>
+            {children}
+            <DialogBackdrop onDismiss={() => onOpenChange(false)} />
+          </>,
+          document.body
+        )}
     </DialogContext.Provider>
   );
 }
