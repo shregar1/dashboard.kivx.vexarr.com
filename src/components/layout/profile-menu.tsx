@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import {
-  User,
   KeyRound,
   Settings,
-  History,
   HelpCircle,
   LogOut,
-  ChevronUp,
-  Pencil
+  ChevronUp
 } from 'lucide-react';
 
 import { Menu, MenuItem, MenuLabel, MenuLink, MenuSeparator, Avatar } from '@/components/ui/menu';
@@ -100,24 +97,6 @@ export function ProfileMenu() {
         <Settings className="size-3.5" />
         Settings
       </MenuItem>
-      <MenuItem
-        onClick={() => {
-          setOpen(false);
-          void navigate({ to: '/sessions' });
-        }}
-      >
-        <History className="size-3.5" />
-        Sessions
-      </MenuItem>
-      <MenuItem
-        onClick={() => {
-          setOpen(false);
-          openEditProfileDialog({ profile, setProfile });
-        }}
-      >
-        <User className="size-3.5" />
-        Edit profile
-      </MenuItem>
 
       <MenuSeparator />
 
@@ -149,30 +128,4 @@ export function ProfileMenu() {
       </MenuItem>
     </Menu>
   );
-}
-
-// Inline edit-profile dialog. Kept here (not in a separate file) because
-// it's only used from this menu — it round-trips through useProfile.
-function openEditProfileDialog({
-  profile,
-  setProfile
-}: {
-  profile: ReturnType<typeof useProfile.getState>['profile'];
-  setProfile: ReturnType<typeof useProfile.getState>['setProfile'];
-}): void {
-  // Lightweight inline flow: prompt for name + email, write to the
-  // local store. The full account-edit surface lives in the desktop
-  // host's KivX account page; this menu is a quick local-edit for
-  // the dashboard display.
-  const next = window.prompt(
-    'Display name',
-    profile.displayName === 'Guest' || profile.displayName === 'Signed out'
-      ? ''
-      : profile.displayName
-  );
-  if (next === null) return;
-  const email = window.prompt('Email', profile.email) ?? profile.email;
-  setProfile({ displayName: next.trim() || 'Guest', email: email.trim() });
-  // Use `void` to mark intentional unused imports.
-  void Pencil;
 }
