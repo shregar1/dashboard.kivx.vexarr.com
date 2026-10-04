@@ -8,11 +8,9 @@ import {
   Mic,
   Activity,
   History,
-  Search,
   Sparkles,
   Bug,
-  Cpu,
-  Plus
+  Cpu
 } from 'lucide-react';
 
 import { Route as RootRoute } from '@/routes/__root';
@@ -28,11 +26,9 @@ const SETTINGS_NAV: NavItem[] = [
   { to: '/settings/data', label: 'Data', icon: Database }
 ];
 
-const SESSIONS_NAV: NavItem[] = [
-  { to: '/sessions', label: 'All sessions', icon: History },
-  { to: '/sessions', label: 'Search', icon: Search },
-  { to: '/sessions', label: 'Orphans', icon: Plus }
-];
+// Sessions uses the global Workspace nav (see HOME_NAV below) — it
+// doesn't need its own per-page sidebar. The search / orphans /
+// export affordances all live inside the page itself.
 
 const PERSONALITY_NAV: NavItem[] = [
   { to: '/personality/overview', label: 'Overview', icon: Sparkles },
@@ -56,15 +52,14 @@ function useNavForCurrentPath(pathname: string): { title: string; items: NavItem
   if (pathname.startsWith('/settings')) {
     return { title: 'Settings', items: SETTINGS_NAV };
   }
-  if (pathname.startsWith('/sessions')) {
-    return { title: 'Sessions', items: SESSIONS_NAV };
-  }
   if (pathname.startsWith('/personality')) {
     return { title: 'Personality', items: PERSONALITY_NAV };
   }
   if (pathname.startsWith('/diagnostics')) {
     return { title: 'Diagnostics', items: DIAGNOSTICS_NAV };
   }
+  // /sessions and the home dashboard share the global Workspace nav
+  // — sessions is its own destination, not a section with sub-pages.
   return { title: 'Workspace', items: HOME_NAV };
 }
 
